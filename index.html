@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Mission Europa · Break it. Fix it. Build it.</title>
+  <meta name="description" content="Mission Europa is an eTwinning project for students aged 15–18: test space-physics games, vote on the fixes and design two new games with crews from across Europe.">
+  <meta name="theme-color" content="#f8f5ff">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mission Europa · Break it. Fix it. Build it.">
+  <meta property="og:description" content="Space-physics games, tested and rebuilt by student crews from across Europe. An eTwinning project, 2026–2027.">
+  <meta property="og:url" content="https://missioneuropa.eu/">
+  <meta property="og:image" content="https://missioneuropa.eu/assets/img/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23111119'/%3E%3Ccircle cx='32' cy='32' r='19' fill='%23fee99c'/%3E%3Cpath d='M16 27c10-4 21-3 32 3M18 38c9-5 19-4 28 1' stroke='%23814b6d' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="grain" aria-hidden="true"></div>
+
+  <header class="site-header" id="top">
+    <a class="brand" href="#top" aria-label="Mission Europa, back to top">
+      <span class="brand-mark" aria-hidden="true">ME</span>
+      <span>MISSION EUROPA</span>
+    </a>
+    <nav class="nav" id="siteNav" aria-label="Main">
+      <a href="#play">Play</a>
+      <a href="#playtest">Playtest</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#crews">Crews</a>
+      <a href="#build">Build</a>
+      <a href="#decide">Decide</a>
+      <a href="#log">Log</a>
+      <a href="#teachers">Teachers</a>
+    </nav>
+    <div class="header-tools">
+      <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false" title="Interface sound">
+        <span class="sound-dot" aria-hidden="true"></span><span class="sound-label">Sound off</span>
+      </button>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-expanded="false" aria-controls="siteNav">
+        <span class="menu-bars" aria-hidden="true"><i></i><i></i></span><span class="menu-label">Menu</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="config-error" id="configError" role="alert" hidden>
+    <b>Site data could not be loaded.</b> Check the last edit in <code>site-config.js</code>: a comma or a quote is probably missing.
+  </div>
+
+  <main id="main">
+    <!-- ============================== HERO ============================== -->
+    <section class="hero section-pad">
+      <div class="hero-copy reveal">
+        <p class="kicker">eTwinning · space physics · 2026–2027</p>
+        <h1><span>MISSION</span><span class="hero-outline">EUROPA</span></h1>
+        <p class="hero-lede">Break our games. Vote on the fixes. Then build two new ones with crews from across Europe. <strong>Every idea has to survive physics.</strong></p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#play" data-sound="launch">Play the games <span aria-hidden="true">↓</span></a>
+          <a class="button button-ghost" href="#timeline" data-sound="tap">What happens next <span aria-hidden="true">↓</span></a>
+        </div>
+        <div class="hero-stats" aria-label="The project in three numbers">
+          <div><b>2</b><span>games to break</span></div>
+          <div><b>2</b><span>games to build</span></div>
+          <div><b>1</b><span>vote per school</span></div>
+        </div>
+      </div>
+
+      <aside class="mission-control reveal" aria-labelledby="mcTitle">
+        <div class="mc-topline">
+          <span id="mcTitle">MISSION CONTROL</span>
+          <span class="live-pill"><i></i> <span id="mcPill">LIVE</span></span>
+        </div>
+        <div class="mc-now">
+          <p class="mc-label" id="mcPhaseLabel">NOW</p>
+          <p class="mc-phase" id="mcPhase">Loading the mission…</p>
+          <div class="mc-count" id="mcCount" aria-live="off">
+            <span class="mc-count-label" id="mcCountLabel">Next</span>
+            <span class="mc-digits" id="mcDigits">–</span>
+          </div>
+        </div>
+        <div class="network-stage" id="networkStage">
+          <canvas id="networkCanvas" aria-hidden="true"></canvas>
+          <div class="europa-core" aria-hidden="true">
+            <span class="europa-glow"></span>
+            <span class="europa-body"></span>
+            <b>EUROPA</b>
+          </div>
+          <div id="networkNodes"></div>
+        </div>
+        <p class="node-info" id="nodeInfo" aria-live="polite">Tap a crew to see who it is.</p>
+        <p class="mc-week"><b>THIS WEEK</b> <span id="mcWeek">–</span></p>
+      </aside>
+    </section>
+
+    <div class="ticker-wrap" aria-hidden="true">
+      <div class="ticker">
+        <div class="ticker-track">
+          <span>BREAK IT</span><i>✦</i><span>FIX IT</span><i>✦</i><span>BUILD IT</span><i>✦</i><span>ONE VOTE PER SCHOOL</span><i>✦</i><span>FROM EUROPE TO EUROPA</span><i>✦</i>
+          <span>BREAK IT</span><i>✦</i><span>FIX IT</span><i>✦</i><span>BUILD IT</span><i>✦</i><span>ONE VOTE PER SCHOOL</span><i>✦</i><span>FROM EUROPE TO EUROPA</span><i>✦</i>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================== PLAY ============================== -->
+    <section class="play section-pad" id="play">
+      <div class="section-heading split reveal">
+        <div>
+          <p class="kicker">The games</p>
+          <h2>Two games to break.<br><em>Two to build.</em></h2>
+        </div>
+        <p>Start with two finished Mission ATLAS games and find everything that confuses, bores or breaks. Then your studio designs a new game, and new players decide which version wins.</p>
+      </div>
+      <div class="game-grid" id="gameGrid"></div>
+      <div id="bonusGame"></div>
+      <p class="more-games reveal">More space-physics games: <a id="atlasLink" href="https://physicsplay.github.io/Astrojourneys/" target="_blank" rel="noopener">the full Mission ATLAS collection ↗</a></p>
+    </section>
+
+    <!-- ============================ PLAYTEST ============================ -->
+    <section class="playtest section-pad" id="playtest">
+      <div class="section-heading reveal">
+        <p class="kicker">How a playtest works</p>
+        <h2>Break it <em>properly.</em></h2>
+        <p>A playtest is not “I liked it”. It is what happened, why it matters and what you would change. Your notes decide what gets fixed, and the fix is credited to your crew.</p>
+      </div>
+
+      <ol class="steps reveal">
+        <li><span class="step-min">5 min</span><b>Briefing</b><p>This week’s mission and your twin crew’s latest post.</p></li>
+        <li><span class="step-min">20 min</span><b>Play one stage</b><p>In groups of two or three. Write down every moment you got stuck.</p></li>
+        <li><span class="step-min">10 min</span><b>Report</b><p>One mission report with your numbers, one feedback card with your idea.</p></li>
+        <li><span class="step-min">10 min</span><b>Post and reply</b><p>Paste both into TwinSpace, then answer your twin crew.</p></li>
+      </ol>
+      <div class="lesson-bar reveal" aria-label="A 45-minute lesson: 5 minutes briefing, 20 minutes play, 10 minutes report, 10 minutes post and reply">
+        <span style="--w:5">5</span><span style="--w:20">20 · PLAY</span><span style="--w:10">10 · REPORT</span><span style="--w:10">10 · POST</span>
+      </div>
+
+      <div class="report-desk reveal" id="reportDesk">
+        <div class="desk-head">
+          <div>
+            <p class="kicker">Report desk</p>
+            <h3>Turn your notes into a post.</h3>
+            <p class="desk-note">If your game has a <b>Copy mission report</b> button, use that. Otherwise build the report here. Nothing you type leaves this page until you copy it.</p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Report type">
+            <button type="button" role="tab" id="tabReport" aria-selected="true" aria-controls="panelReport">Mission report</button>
+            <button type="button" role="tab" id="tabCard" aria-selected="false" aria-controls="panelCard" tabindex="-1">Feedback card</button>
+          </div>
+        </div>
+
+        <div class="desk-panel" role="tabpanel" id="panelReport" aria-labelledby="tabReport">
+          <form class="desk-form" id="formReport" autocomplete="off">
+            <label class="span-sm">Crew<select name="crew"></select></label>
+            <label class="span-sm">Game<select name="game"></select></label>
+            <label>Version<input name="version" type="text" inputmode="decimal" maxlength="8"></label>
+            <label>Stage<select name="stage">
+              <option>1 Watch</option><option>2 Predict</option><option>3 Inverse</option><option>4 Crisis</option>
+            </select></label>
+            <label>Device<select name="device"><option>computer</option><option>tablet</option><option>phone</option></select></label>
+            <label>Attempts<input name="tries" type="number" min="1" max="99" value="1"></label>
+            <label>Best error (%)<input name="error" type="number" min="0" max="999" step="0.1" placeholder="e.g. 7"></label>
+            <label>Hints used<input name="hints" type="number" min="0" max="20" value="0"></label>
+            <label>Minutes<input name="minutes" type="number" min="1" max="90" value="20"></label>
+            <fieldset class="rating" data-name="fun"><legend>Fun</legend></fieldset>
+            <fieldset class="rating" data-name="clarity"><legend>Clarity</legend></fieldset>
+            <fieldset class="rating" data-name="physics"><legend>Helped with the physics</legend></fieldset>
+            <label class="ab-only" hidden>Blind test: play again?<select name="prefer"><option value="">not asked</option><option value="A">version A</option><option value="B">version B</option></select></label>
+          </form>
+          <div class="desk-output">
+            <pre id="outReport" aria-live="polite"></pre>
+            <div class="desk-actions">
+              <button class="button button-primary small" type="button" data-copy="outReport" data-sound="tap">Copy report</button>
+              <span class="paste-hint" id="pasteHintReport"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="desk-panel" role="tabpanel" id="panelCard" aria-labelledby="tabCard" hidden>
+          <form class="desk-form card-form" id="formCard" autocomplete="off">
+            <label class="span-sm">Crew<select name="crew"></select></label>
+            <label class="span-sm">Game<select name="game"></select></label>
+            <label>Version<input name="version" type="text" maxlength="8"></label>
+            <label>Stage<select name="stage">
+              <option>1 Watch</option><option>2 Predict</option><option>3 Inverse</option><option>4 Crisis</option><option>whole game</option>
+            </select></label>
+            <label>It is about<select name="about"><option>clarity</option><option>fun</option><option>physics</option><option>a bug</option><option>accessibility</option></select></label>
+            <label class="wide">What happened?<textarea name="what" rows="3" maxlength="400" placeholder="When we…, the game…"></textarea></label>
+            <label class="wide">Why does it matter?<textarea name="why" rows="2" maxlength="300" placeholder="This matters because…"></textarea></label>
+            <label class="wide">What do you propose?<textarea name="fix" rows="2" maxlength="300" placeholder="We suggest…"></textarea></label>
+            <div class="starters wide" aria-label="Sentence starters">
+              <span>Sentence starters:</span>
+              <button type="button" data-starter="We expected …, but …">We expected…</button>
+              <button type="button" data-starter="We got stuck when …">We got stuck when…</button>
+              <button type="button" data-starter="I claim … because … My question is …">Claim · Support · Question</button>
+              <button type="button" data-starter="It would be clearer if …">It would be clearer if…</button>
+            </div>
+          </form>
+          <div class="desk-output">
+            <pre id="outCard" aria-live="polite"></pre>
+            <div class="desk-actions">
+              <button class="button button-primary small" type="button" data-copy="outCard" data-sound="tap">Copy card</button>
+              <span class="paste-hint" id="pasteHintCard"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ TIMELINE ============================ -->
+    <section class="timeline section-pad" id="timeline">
+      <div class="section-heading split reveal">
+        <div>
+          <p class="kicker">Mission timeline</p>
+          <h2>Six phases.<br><em>You are here.</em></h2>
+        </div>
+        <p id="timelineIntro">October to April, never more than one lesson a week. The site moves the marker by itself.</p>
+      </div>
+      <div class="progress reveal" aria-hidden="true"><span id="progressFill"></span><b id="progressLabel"></b></div>
+      <ol class="phase-list reveal" id="phaseList"></ol>
+      <div class="key-dates reveal">
+        <h3>Key dates</h3>
+        <ul id="keyDates"></ul>
+      </div>
+    </section>
+
+    <!-- ============================== CREWS ============================= -->
+    <section class="crews section-pad" id="crews">
+      <div class="crews-bg" aria-hidden="true"><span>EU</span></div>
+      <div class="section-heading reveal">
+        <p class="kicker">European crews</p>
+        <h2>Not six parallel classrooms.<br><em>One distributed team.</em></h2>
+        <p>Every school is a crew. Every crew has a twin crew in another country for the whole project. For each new game, two or three schools form an international studio, and the studios are reshuffled for Game 2.</p>
+      </div>
+      <div class="crew-grid reveal" id="crewGrid"></div>
+
+      <div class="kit reveal" id="kickoff">
+        <article class="kit-card callsign">
+          <p class="kicker">Kick-off kit · 1</p>
+          <h3>Get a call sign</h3>
+          <p>Your call sign goes in the credits instead of your real name. Keep one you like, or invent your own.</p>
+          <p class="callsign-out" id="callsignOut" aria-live="polite">— — —</p>
+          <div class="kit-actions">
+            <button class="button button-light small" id="callsignBtn" type="button" data-sound="tap">Generate</button>
+            <button class="button button-ghost-dark small" type="button" data-copy="callsignOut" data-sound="tap">Copy</button>
+          </div>
+        </article>
+        <article class="kit-card quiz" id="roleQuiz" aria-live="polite">
+          <p class="kicker">Kick-off kit · 2</p>
+          <h3>Which crew role fits you?</h3>
+          <div id="quizBody"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================== BUILD ============================= -->
+    <section class="build section-pad" id="build">
+      <div class="section-heading split reveal">
+        <div>
+          <p class="kicker">The build lab</p>
+          <h2>Your game.<br><em>Four rules.</em></h2>
+        </div>
+        <p>Every new game follows the same four mission rules, so the physics stays honest. Everything else is up to your studio.</p>
+      </div>
+
+      <ol class="rules reveal">
+        <li><span>01</span><b>One physics relationship per game.</b></li>
+        <li><span>02</span><b>Players commit their number before the simulation runs.</b></li>
+        <li><span>03</span><b>The game never shows the answer before the player commits.</b></li>
+        <li><span>04</span><b>Four stages: Watch → Predict → Inverse → Crisis.</b><small>A bronze medal unlocks the next stage.</small></li>
+      </ol>
+
+      <div class="yours reveal">
+        <div class="yours-copy">
+          <p class="kicker">Everything else is yours</p>
+          <h3>Setting. Story. Characters. Controls. Help. Look and sound.</h3>
+          <p>You do not need to code. Your crew can send content that goes straight into a game: crisis events, hints, briefings, character lines, debrief facts and translations.</p>
+        </div>
+        <div class="sticker-field" aria-hidden="true">
+          <span class="sticker s1">STORY</span>
+          <span class="sticker s2">HINTS</span>
+          <span class="sticker s3">CRISIS<br>EVENTS</span>
+          <span class="sticker s4">LOOK +<br>SOUND</span>
+        </div>
+      </div>
+
+      <div class="physics-menu">
+        <div class="section-heading small-heading reveal">
+          <p class="kicker">The physics menu</p>
+          <h3>Pick the physics. Real missions included.</h3>
+          <p>Studios vote from a short menu that teachers have checked. Three examples:</p>
+        </div>
+        <div class="phys-grid reveal">
+          <article class="phys-card" id="physInverse">
+            <span class="phys-tag">Inverse-square law</span>
+            <p class="phys-eq">P ∝ 1 / r²</p>
+            <h4>Why does Europa Clipper need solar arrays about 30 m wide?</h4>
+            <label class="slider-label" for="invR">Distance from the Sun: <b id="invRVal">5.2 AU</b> <span id="invPlanet">Jupiter</span></label>
+            <input type="range" id="invR" min="0.7" max="9.6" step="0.01" value="5.2">
+            <div class="inv-readout">
+              <div><b id="invSun">3.7%</b><span>of the sunlight at Earth</span></div>
+              <div><b id="invArea">×27</b><span>panel area for the same power</span></div>
+            </div>
+            <div class="inv-visual" aria-hidden="true"><span id="invSquare"></span><small>Earth-sized panel</small></div>
+          </article>
+          <article class="phys-card dark" id="physKepler">
+            <span class="phys-tag">Kepler’s third law</span>
+            <p class="phys-eq">T² ∝ a³</p>
+            <h4>Io, Europa and Ganymede orbit Jupiter in a 1 : 2 : 4 rhythm.</h4>
+            <canvas id="keplerCanvas" width="360" height="240" aria-label="Animation of Io, Europa and Ganymede orbiting Jupiter; Io completes four orbits while Europa completes two and Ganymede one."></canvas>
+            <p class="kepler-count" id="keplerCount">Io 0 · Europa 0 · Ganymede 0</p>
+            <button class="button button-light small" id="keplerBtn" type="button" aria-pressed="true">Pause</button>
+            <p class="phys-foot">Double the period and the orbit is 2<sup>2/3</sup> ≈ 1.59 times wider.</p>
+          </article>
+          <article class="phys-card" id="physMomentum">
+            <span class="phys-tag">Momentum transfer</span>
+            <p class="phys-eq">Δv = β · m u / M</p>
+            <h4>In 2022, NASA’s DART hit Dimorphos and shortened its orbit by about 33 minutes.</h4>
+            <svg class="dart-svg" viewBox="0 0 300 116" role="img" aria-label="Diagram: the spacecraft DART hits the small moon Dimorphos, which orbits the larger asteroid Didymos">
+              <defs><marker id="dartArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z" fill="#ff4f91"/></marker></defs>
+              <ellipse cx="120" cy="60" rx="92" ry="34" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="4 5"/>
+              <circle cx="120" cy="60" r="25" fill="#c9b49a" stroke="currentColor" stroke-opacity=".5"/>
+              <circle cx="211" cy="56" r="8" fill="#9c8b7a" stroke="currentColor" stroke-opacity=".6"/>
+              <line x1="292" y1="14" x2="224" y2="49" stroke="#ff4f91" stroke-width="3" marker-end="url(#dartArrow)"/>
+              <text x="266" y="12" font-size="11" font-weight="800" fill="#ff4f91">DART</text>
+              <text x="120" y="110" font-size="11" text-anchor="middle" fill="currentColor">Didymos</text>
+              <text x="211" y="80" font-size="11" text-anchor="middle" fill="currentColor">Dimorphos</text>
+            </svg>
+            <p class="dart-orbit">Orbit around Didymos: 11 h 55 min → 11 h 22 min</p>
+            <p>The missing number is <b>M</b>, the asteroid’s mass. ESA’s Hera arrives in November 2026 to measure it. Once M is known, the push factor <b>β</b> follows.</p>
+            <p class="phys-foot">m ≈ 580 kg, u ≈ 6.1 km/s. β &gt; 1 means the flying debris added extra push.</p>
+          </article>
+        </div>
+      </div>
+
+      <div class="brief-wrap reveal">
+        <div class="brief-head">
+          <div>
+            <p class="kicker">Design brief</p>
+            <h3>One page. Four boxes.</h3>
+            <p>Your studio fills in one box per stage, plus the setting, the player’s role, the help available and how success is recognised. Twin crews review it, teachers check the physics, then it is locked.</p>
+          </div>
+          <button class="button button-primary small" id="printBrief" type="button" data-sound="tap">Print the brief</button>
+        </div>
+        <section class="brief" id="briefTemplate" aria-label="Design brief template">
+          <header class="brief-top">
+            <b>MISSION EUROPA · DESIGN BRIEF</b>
+            <span>Game ____ · Studio ______________ · Crews ______________</span>
+            <span>Physics relationship: ______________________________</span>
+          </header>
+          <div class="brief-grid">
+            <div><b>1 · WATCH</b><p>What does the player watch happen?</p></div>
+            <div><b>2 · PREDICT</b><p>What number does the player commit before the simulation runs?</p></div>
+            <div><b>3 · INVERSE</b><p>What does the player work out in reverse?</p></div>
+            <div><b>4 · CRISIS</b><p>What goes wrong, and what must the player decide?</p></div>
+          </div>
+          <div class="brief-lines">
+            <p><b>Setting</b></p><p><b>The player’s role</b></p><p><b>Help available</b></p><p><b>How success is recognised</b></p>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ============================= DECIDE ============================= -->
+    <section class="decide section-pad" id="decide">
+      <div class="section-heading reveal">
+        <p class="kicker">The decision room</p>
+        <h2>One school.<br><em>One vote.</em></h2>
+        <p>New players in every school test version A and version B blind. Each school’s result counts once, whatever the size of the class. The version preferred in most schools goes forward; a tie is decided by the learning data (smaller errors, fewer hints). Then the crews vote on which features of the other version to carry over, so no studio’s work is lost.</p>
+      </div>
+      <div class="rooms" id="decisionRooms"></div>
+    </section>
+
+    <!-- =============================== LOG ============================== -->
+    <section class="log section-pad" id="log">
+      <div class="section-heading split reveal">
+        <div>
+          <p class="kicker">Patch notes · Hall of Fame</p>
+          <h2>Your idea,<br><em>shipped.</em></h2>
+        </div>
+        <p>Every change to a game appears here within 7–10 days of your playtest, credited to the crew that proposed it. Confirmed bugs and physics errors earn bounty points for your crew.</p>
+      </div>
+      <div class="log-grid reveal">
+        <article class="log-card patches">
+          <h3>Patch notes</h3>
+          <ol id="patchList" class="patch-list"></ol>
+        </article>
+        <div class="log-side">
+          <article class="log-card board">
+            <h3>Bug bounty</h3>
+            <ol id="leaderboard" class="leaderboard"></ol>
+          </article>
+          <article class="log-card bloopers">
+            <h3>Blooper reel</h3>
+            <div id="bloopers" class="blooper-grid"></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================== CREW CODE ============================ -->
+    <section class="code section-pad" id="code">
+      <div class="code-card reveal">
+        <div>
+          <p class="kicker">Crew code</p>
+          <h2>Five rules.<br><em>No exceptions.</em></h2>
+        </div>
+        <ol class="code-list">
+          <li><span><b>Call signs, not names.</b> Your real name never appears on this site or in the games.</span></li>
+          <li><span><b>Critique the game, never the person.</b></span></li>
+          <li><span><b>Evidence beats opinion.</b> Say what happened, then what you would change.</span></li>
+          <li><span><b>Share only what your school allows.</b> Photos, voices and faces follow your school’s consent rules.</span></li>
+          <li><span><b>Your work, your credit.</b> Student contributions are published under a CC BY licence with your crew’s name.</span></li>
+        </ol>
+        <p class="privacy">This site uses no cookies, no analytics and no accounts. The games keep your unlocked stages only in your own browser.</p>
+      </div>
+    </section>
+
+    <!-- ============================ TEACHERS ============================ -->
+    <section class="teachers section-pad" id="teachers">
+      <div class="section-heading split reveal">
+        <div>
+          <p class="kicker">For teachers</p>
+          <h2>Join the<br><em>mission.</em></h2>
+        </div>
+        <p>Up to six schools, students aged 15–18, 12 lessons (core track) or 20 (full track), never more than one a week. No programming and no required live meetings.</p>
+      </div>
+      <div class="teacher-grid reveal">
+        <article class="t-card t-join">
+          <h3>How to join</h3>
+          <p id="joinText">Contact the project coordinator through the European School Education Platform.</p>
+          <div class="t-links" id="teacherLinks"></div>
+        </article>
+        <article class="t-card">
+          <h3>Before the kick-off</h3>
+          <ul>
+            <li>Pupil accounts in TwinSpace</li>
+            <li>Media consent, in line with your school’s rules</li>
+            <li>Your school holidays in the shared calendar</li>
+          </ul>
+          <p class="t-small" id="setupBy">No lessons needed for this.</p>
+        </article>
+        <article class="t-card">
+          <h3>Every phase, your pace</h3>
+          <p>Every school takes part in every phase. The core track uses fewer lessons per phase; the full track uses all 20. Blind playtests need a group of new players, such as another class, for part of a lesson, and Launch Week needs an audience.</p>
+        </article>
+        <details class="t-card t-switches">
+          <summary><h3>Useful switches</h3><span aria-hidden="true">+</span></summary>
+          <dl>
+            <dt><code>?test=1</code></dt><dd>Tester mode: version number, stage select and progress reset (once a game supports it).</dd>
+            <dt><code>?v=A</code> · <code>?v=B</code></dt><dd>The two versions of a new game during blind playtests.</dd>
+            <dt><code>?station=echo</code></dt><dd>The Quiet One: assigns a station to a crew.</dd>
+            <dt><code>?crews=echo,drift,auriga</code></dt><dd>The Quiet One: runs with fewer schools.</dd>
+          </dl>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="foot-brand"><b>MISSION EUROPA</b><span>An eTwinning project · October 2026 to April 2027</span></div>
+    <div class="footer-note">Games: MIT licence. Student contributions: CC BY, credited to their crews. No cookies, no tracking.</div>
+    <a href="#top">Back to top ↑</a>
+  </footer>
+
+  <div class="modal" id="qrModal" role="dialog" aria-modal="true" aria-labelledby="qrTitle" hidden>
+    <div class="modal-card">
+      <button class="modal-close" type="button" data-close aria-label="Close">×</button>
+      <p class="kicker">Scan to play</p>
+      <h3 id="qrTitle">QR code</h3>
+      <div class="qr-row" id="qrRow"></div>
+    </div>
+  </div>
+
+  <script src="site-config.js"></script>
+  <script src="assets/vendor/qrcode.min.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<title>Mission ATLAS #09 — Comet Lander: Rosetta's Philae</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#030510;--panel:rgba(10,14,30,.92);--card:rgba(255,255,255,.035);--line:rgba(255,255,255,.11);--text:#eef3ff;--muted:#b0c0dd;
+  --gold:#ffd166;--cyan:#6be0ff;--red:#ff7070;--green:#7ce38b;--purple:#b08cff;--orange:#ffaa55;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--ui:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif}
+html,body{min-height:100%;background:linear-gradient(180deg,#020510,#0a0820,#0e0818);color:var(--text);font-family:var(--ui);overflow-x:hidden}
+button,input,select,textarea{font:inherit;color:var(--text)}button{cursor:pointer}
+.hidden{display:none!important}
+.good{color:var(--green)!important}.warn{color:var(--gold)!important}.bad{color:var(--red)!important}
+.tag{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--purple)}
+.block{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px}
+.block h3{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.mini{font-size:.82rem;color:var(--muted);line-height:1.42}
+.formula{font-family:var(--mono);font-size:.78rem;white-space:pre-line;color:rgba(200,212,232,.88);line-height:1.45;padding:9px;border-radius:9px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.06)}
+.pill{display:inline-block;padding:3px 8px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:.66rem;color:var(--muted);font-family:var(--mono);margin:2px}
+.pill.done{border-color:rgba(124,227,139,.4);background:rgba(124,227,139,.08);color:var(--green)}
+.btn{padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:.84rem;transition:.15s}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.12)}
+.btn.pri{background:linear-gradient(135deg,#b08cff,#7c6cff);color:#fff;border-color:rgba(176,140,255,.5);font-weight:800}
+.btn.go{background:linear-gradient(135deg,#6be0ff,#2aa8d0);color:#04202c;border-color:rgba(107,224,255,.5);font-weight:800}
+.btn.hint{background:rgba(107,224,255,.08);border-color:rgba(107,224,255,.25)}
+.btn.danger{background:rgba(255,112,112,.1);border-color:rgba(255,112,112,.3)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.numInput{width:110px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);padding:6px 8px;font-family:var(--mono);font-size:.86rem;text-align:right}
+.numInput:focus{outline:none;border-color:rgba(176,140,255,.55);box-shadow:0 0 0 2px rgba(176,140,255,.15)}
+.numInput.error{border-color:var(--red);background:rgba(255,112,112,.07)}
+.numInput:disabled{opacity:.35}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(140%);padding:10px 20px;border-radius:999px;background:rgba(10,14,28,.96);border:1px solid rgba(176,140,255,.35);color:#d4c0ff;font-weight:700;font-size:.84rem;z-index:70;transition:transform .3s;pointer-events:none;max-width:92vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+@keyframes shake{0%,100%{transform:translate(0)}15%{transform:translate(-3px,2px)}30%{transform:translate(3px,-2px)}45%{transform:translate(-2px,1px)}}
+.shaking{animation:shake .35s ease}
+#fwCanvas{position:fixed;inset:0;pointer-events:none;z-index:65}
+
+/* Insight layer (canonical — same as ExoCase) */
+.insight{background:linear-gradient(135deg,rgba(176,140,255,.09),rgba(107,224,255,.05));border:1px solid rgba(176,140,255,.32);border-radius:14px;padding:12px;margin-bottom:8px}
+.insight h3{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--purple);margin-bottom:5px}
+.insight .q{font-size:.88rem;line-height:1.42;margin-bottom:6px}
+.mcq-opt{display:block;width:100%;text-align:left;padding:9px 11px;margin-top:6px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.04);font-size:.83rem;line-height:1.35;transition:.15s}
+.mcq-opt:hover:not(:disabled){transform:translateX(3px);border-color:rgba(176,140,255,.4)}
+.mcq-opt.right{border-color:rgba(124,227,139,.6);background:rgba(124,227,139,.1)}
+.mcq-opt.wrong{border-color:rgba(255,112,112,.5);background:rgba(255,112,112,.07);opacity:.75}
+.mcq-opt:disabled{cursor:default}
+.lawline{margin-top:7px;padding:8px 10px;border-radius:9px;background:rgba(124,227,139,.07);border-left:3px solid var(--green);font-size:.79rem;color:rgba(222,240,226,.95)}
+.gate-note{font-size:.72rem;color:var(--orange);font-family:var(--mono);margin-top:6px}
+.solution{margin-top:8px;border:1px dashed rgba(124,227,139,.35);border-radius:10px;background:rgba(124,227,139,.05);padding:10px}
+.solution h4{font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:5px}
+.att-badge{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;font-size:.64rem;font-family:var(--mono);border:1px solid rgba(255,170,85,.35);background:rgba(255,170,85,.08);color:var(--orange)}
+
+/* INTRO */
+#introScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;
+  background:radial-gradient(ellipse at 30% 20%,rgba(107,224,255,.07),transparent 50%),radial-gradient(ellipse at 70% 30%,rgba(176,140,255,.06),transparent 50%),linear-gradient(180deg,#020510,#0a0820,#100818)}
+.icard{width:min(1080px,96vw);border-radius:26px;border:1px solid rgba(255,255,255,.1);background:radial-gradient(800px 400px at 50% 0%,rgba(176,140,255,.08),transparent 55%),var(--panel);box-shadow:0 30px 80px rgba(0,0,0,.6);padding:22px}
+.ititle{font-size:clamp(1.5rem,4vw,2.3rem);font-weight:900;letter-spacing:-.02em;line-height:1.1;margin-bottom:10px}
+.ititle span{background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.igrid{display:grid;grid-template-columns:1.25fr .85fr;gap:12px}
+@media(max-width:860px){.igrid{grid-template-columns:1fr}}
+.idialogue{line-height:1.6;color:rgba(235,240,255,.92);font-size:.89rem}
+.idialogue .who{font-weight:800;color:#d4c0ff}
+.idialogue .em{color:var(--gold);font-weight:700}
+.idialogue .par{color:var(--cyan);font-family:var(--mono)}
+.ibtn{padding:7px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:.84rem;transition:.15s;cursor:pointer}
+.ibtn:hover{transform:translateY(-1px)}.ibtn.active{background:rgba(176,140,255,.14);border-color:rgba(176,140,255,.5)}
+.igo{display:block;width:100%;padding:14px;border-radius:14px;border:1px solid rgba(124,227,139,.55);background:linear-gradient(135deg,#7ce38b,#2ecc71);color:#04140a;font-weight:900;font-size:1.02rem;text-align:center;margin-top:10px;cursor:pointer;transition:.15s}
+.igo:hover{filter:brightness(1.08);transform:translateY(-1px)}
+kbd{font-family:var(--mono);font-size:.72rem;padding:2px 5px;border-radius:4px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:700px){.g2{grid-template-columns:1fr}}
+
+/* GAME */
+#gameScreen{display:none}
+.gl{display:grid;grid-template-columns:1fr 400px;grid-template-rows:auto auto auto 1fr auto;min-height:100vh}
+@media(max-width:1020px){.gl{grid-template-columns:1fr;grid-template-rows:auto auto auto minmax(300px,42vh) auto auto}}
+.topbar{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 14px;border-bottom:1px solid var(--line);background:rgba(10,14,30,.94);backdrop-filter:blur(8px);z-index:5}
+.tbt{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.84rem}
+.tbs{display:flex;gap:5px}
+.ts{min-width:60px;padding:4px 8px;border-radius:9px;text-align:center;background:var(--card);border:1px solid var(--line)}
+.ts .v{font-family:var(--mono);font-size:.86rem;font-weight:700}.ts .k{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ts.streak .v{color:var(--orange)}
+@keyframes score-pop{0%{transform:scale(1)}50%{transform:scale(1.45);color:var(--gold)}100%{transform:scale(1)}}
+.score-pop{animation:score-pop .4s ease}
+.stages{grid-column:1/-1;display:flex;gap:4px;padding:6px 14px;border-bottom:1px solid var(--line);background:rgba(10,14,30,.85);overflow-x:auto}
+.stbtn{padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);font-size:.72rem;font-family:var(--mono);white-space:nowrap;transition:.12s}
+.stbtn.active{background:rgba(176,140,255,.13);border-color:rgba(176,140,255,.45);color:var(--purple)}
+.stbtn.done{background:rgba(124,227,139,.08);border-color:rgba(124,227,139,.3);color:var(--green)}
+.stbtn.locked{opacity:.4;cursor:not-allowed}
+@keyframes pulse-glow{0%,100%{box-shadow:0 0 6px rgba(176,140,255,.15)}50%{box-shadow:0 0 18px rgba(176,140,255,.45)}}
+.stbtn.active{animation:pulse-glow 2s ease infinite}
+.cw{position:relative;overflow:hidden;background:#020510;min-height:280px}
+.cw canvas{position:absolute;inset:0;width:100%;height:100%}
+.radio-msg{position:absolute;top:10px;left:50%;transform:translateX(-50%);padding:7px 18px;border-radius:999px;background:rgba(0,0,0,.85);border:1px solid rgba(176,140,255,.3);font-family:var(--mono);font-size:.78rem;color:#d4c0ff;z-index:8;pointer-events:none;opacity:0;transition:opacity .4s;max-width:92%;text-align:center}
+.radio-msg.on{opacity:1}
+.countdown{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-size:6rem;font-weight:900;font-family:var(--mono);color:var(--gold);text-shadow:0 0 40px rgba(255,209,102,.5);z-index:9;pointer-events:none}
+.countdown.on{display:flex}
+.side{border-left:1px solid var(--line);background:linear-gradient(180deg,rgba(10,14,30,.9),rgba(10,14,30,.65));overflow-y:auto;padding:8px}
+@media(max-width:1020px){.side{border-left:none;border-top:1px solid var(--line)}}
+.foot{grid-column:1/-1;border-top:1px solid var(--line);background:rgba(10,14,30,.9);display:flex;justify-content:space-between;padding:5px 14px;font-size:.66rem;color:var(--muted);gap:8px;flex-wrap:wrap}
+.sr{display:flex;justify-content:space-between;gap:6px;font-size:.8rem;padding:2px 0}
+.sr .k{color:var(--muted)}.sr .v{font-family:var(--mono);font-weight:600}
+.nb-step{padding:9px;border-radius:10px;background:rgba(0,0,0,.16);border:1px solid rgba(255,255,255,.06);margin-bottom:7px}
+.nb-step .step-num{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--purple);color:#fff;text-align:center;line-height:22px;font-size:.7rem;font-weight:700;margin-right:6px}
+.nb-step .step-text{font-size:.82rem;color:rgba(230,240,255,.9)}
+.ach{display:flex;gap:4px;flex-wrap:wrap}
+.ach span{font-size:.64rem;padding:3px 7px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted);font-family:var(--mono);opacity:.5}
+.ach span.earned{opacity:1;border-color:rgba(255,209,102,.45);background:rgba(255,209,102,.09);color:var(--gold)}
+.crisis-timer{font-family:var(--mono);font-size:1.5rem;font-weight:900;color:var(--red);text-align:center;padding:4px}
+/* end modal */
+.ov{position:fixed;inset:0;background:rgba(2,5,16,.88);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;z-index:60;overflow-y:auto;padding:20px 10px}
+.ov.open{display:flex}
+.emod{width:min(880px,96vw);border-radius:22px;border:1px solid rgba(255,255,255,.12);background:var(--panel);padding:20px;margin:auto}
+.medal{font-size:1.4rem;font-weight:900;font-family:var(--mono);padding:6px 16px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+.etbl{width:100%;border-collapse:collapse;font-size:.8rem}
+.etbl th{text-align:left;color:var(--muted);font-weight:600;padding:3px 6px 3px 0}
+.etbl td{font-family:var(--mono);padding:3px 0}
+@media(max-width:420px){
+  .ts{min-width:50px;padding:3px 6px}.ts .v{font-size:.76rem}
+  .stbtn{padding:6px 8px;font-size:.62rem}.numInput{width:96px}
+  .block{padding:10px}.insight{padding:10px}
+}
+.hintbar{grid-column:1/-1;display:flex;gap:10px;align-items:flex-start;padding:9px 14px;background:linear-gradient(90deg,rgba(255,209,102,.16),rgba(255,209,102,.04));border-bottom:1px solid rgba(255,209,102,.4);color:#ffe6ad;font-size:.9rem;line-height:1.5}
+.hintbar #hintBarText{flex:1}
+.hintbar-x{margin-left:auto;flex:none;background:rgba(0,0,0,.25);border:1px solid rgba(255,209,102,.45);border-radius:7px;color:#ffe6ad;padding:2px 9px;font-family:var(--mono);cursor:pointer}
+.whycorrect{margin-top:8px;padding:10px 12px;border-radius:10px;background:rgba(124,227,139,.1);border:1px solid rgba(124,227,139,.45)}
+.whycorrect .wc-head{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;color:#7ce38b;text-transform:uppercase;margin-bottom:3px}
+.whycorrect .wc-opt{font-size:.86rem;color:#dfffe9;font-weight:600;margin-bottom:4px}
+.whycorrect .wc-law{font-size:.8rem;color:rgba(220,240,228,.92);line-height:1.45}
+</style>
+</head>
+<body>
+
+<!-- ================= INTRO ================= -->
+<div id="introScreen">
+<div class="icard">
+  <div class="tag">MISSION ATLAS / GAME 09 — FREE FALL ON A COMET</div>
+  <div class="ititle">☄️ COMET LANDER: <span>Rosetta's Philae</span></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+    <span class="pill">ESA Rosetta · 12 Nov 2014</span><span class="pill">67P/Churyumov–Gerasimenko</span><span class="pill">Big Idea #7.8 + #5.8</span>
+  </div>
+  <div class="igrid">
+    <div>
+      <div class="block"><div class="idialogue" id="xDial"></div><div class="mini" style="margin-top:8px" id="xHero"></div></div>
+      <div class="g2">
+        <div class="block"><h3>🎯 Learning target</h3><div class="mini" id="xLrn"></div></div>
+        <div class="block"><h3>⚠️ Misconception to break</h3><div class="mini" id="xMis"></div></div>
+      </div>
+      <div class="block"><h3>🧪 Model & assumptions (stated honestly)</h3>
+        <div class="mini">1-D vertical free fall · constant g = 1.0×10⁻³ m/s² (67P surface, varies in reality) · no comet rotation, no gas drag · Earth panel neglects air resistance (stated!) · bounce modelled with a restitution coefficient · escape speed ≈ 0.9 m/s applies to the REBOUND velocity.</div></div>
+    </div>
+    <div>
+      <div class="block">
+        <h3>Language</h3>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="iLangs"><button class="ibtn active" data-lang="en">EN 🇬🇧</button><button class="ibtn" data-lang="el">EL 🇬🇷</button><button class="ibtn" data-lang="it">IT 🇮🇹</button></div>
+        <h3 style="margin-top:8px">Difficulty <span class="pill" id="diffDesc">generous tolerances</span></h3>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="iDiffs"><button class="ibtn active" data-diff="easy">Easy</button><button class="ibtn" data-diff="medium">Medium</button><button class="ibtn" data-diff="hard">Hard</button></div>
+      </div>
+      <div class="block"><h3>📐 Key formulas (given)</h3><div class="formula" id="xForm"></div></div>
+      <div class="block"><h3>🎓 Curriculum — 4 stages</h3>
+        <div class="mini">1️⃣ <b>Watch</b> — same drop on Earth &amp; 67P, live<br>2️⃣ <b>Predict</b> — compute t &amp; v; numbers unlock Release<br>3️⃣ <b>Inverse</b> — find the push v₀ for a target touchdown<br>4️⃣ <b>Bounce Crisis</b> — the real 2014 failure, your call<br><span style="color:var(--orange)">Bronze+ unlocks the next stage.</span></div></div>
+      <div class="block"><h3>Controls</h3><div class="mini" id="xKeys"><kbd>Space</kbd> release · <kbd>P</kbd> pause · <kbd>R</kbd> reset stage · <kbd>H</kbd> hint · <kbd>Enter</kbd> commit. Each stage opens with a <b>🧠 reasoning question</b> that unlocks the numbers. Wrong submissions −2 pts. ⏩ Time compression is always labelled — physics is never faked.</div></div>
+      <div class="block"><h3>🏅 How scoring works</h3><div class="mini">Every stage: answer the reasoning question, then <b>compute and commit a number</b>. Your medal is set by accuracy — 🥇 under 5% · 🥈 under 10% · 🥉 under 20% error — and a Bronze or better unlocks the next stage. A wrong answer costs −2 points (−1 on Easy, and your first reasoning slip on each question is free on Easy). A hint costs −3/−4/−5. Fewer tries and higher accuracy mean a higher score — so it always pays to calculate, not guess.</div></div>
+      <button class="igo" id="goBtn">🚀 Start mission</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ================= GAME ================= -->
+<div id="gameScreen">
+<div class="gl">
+  <div class="topbar">
+    <div class="tbt"><span>☄️</span><strong>COMET LANDER</strong></div>
+    <div class="tbs">
+      <div class="ts"><div class="v" id="tsStage">1/4</div><div class="k">Stage</div></div>
+      <div class="ts"><div class="v" id="tsScore">0</div><div class="k">Score</div></div>
+      <div class="ts streak"><div class="v" id="tsStreak">0</div><div class="k">🔥 Streak</div></div>
+      <div class="ts"><div class="v" id="tsAtt">0</div><div class="k">Wrong</div></div>
+      <div class="ts"><div class="v" id="tsHints">0</div><div class="k">Hints</div></div>
+    </div>
+    <div style="display:flex;gap:4px" id="gLangs"><button class="ibtn" data-lang="en" style="padding:4px 7px;font-size:.7rem">EN</button><button class="ibtn" data-lang="el" style="padding:4px 7px;font-size:.7rem">EL</button><button class="ibtn" data-lang="it" style="padding:4px 7px;font-size:.7rem">IT</button></div>
+  </div>
+
+  <div class="stages" id="stageBar"></div>
+  <div class="hintbar hidden" id="hintBar"><span id="hintBarText"></span><button class="hintbar-x" id="hintBarX">✕ close</button></div>
+
+  <div class="cw" id="stageWrap">
+    <canvas id="C"></canvas>
+    <div class="radio-msg" id="radio"></div>
+    <div class="countdown" id="cdBox"></div>
+  </div>
+
+  <aside class="side" id="sidePanel"><!-- built per stage --></aside>
+
+  <div class="foot"><div>Rosetta/Philae · ESA · NPC: Dr. Mara Costa + PHIL</div><div>ATLAS #09 · SI units · wrong try −2 · hint −3/−4/−5</div></div>
+</div>
+</div>
+
+<!-- ================= DEBRIEF ================= -->
+<div class="ov" id="endScr">
+<div class="emod">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <div><div class="tag">ATLAS / COMET DEBRIEF</div><h2 id="eTit"></h2></div>
+    <span class="medal" id="eMed"></span>
+  </div>
+  <div class="g2" style="margin-top:10px">
+    <div class="block"><h3>Results</h3><table class="etbl"><tbody id="eRB"></tbody></table></div>
+    <div class="block"><h3>Analysis (Article 8: precision, not politeness)</h3><table class="etbl"><tbody id="eAB"></tbody></table></div>
+  </div>
+  <div class="block" style="margin-top:6px"><h3>✅ Full solution (as on paper)</h3><div class="mini" id="eSol"></div></div>
+  <div class="block"><canvas id="eCh" width="820" height="170" style="width:100%"></canvas>
+    <div class="mini" style="margin-top:3px"><span style="color:var(--cyan)">━ altitude</span> &nbsp; <span style="color:var(--gold)">━ speed</span></div></div>
+  <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+    <button class="btn danger" id="bRetry" style="flex:1">↺ Retry stage</button>
+    <button class="btn pri" id="bNext" style="flex:2">Next stage →</button>
+  </div>
+</div>
+</div>
+
+<canvas id="fwCanvas"></canvas>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* ================================================================
+   MISSION ATLAS #09 — COMET LANDER v2 (Charter-compliant rewrite)
+   ONE relationship: uniformly accelerated vertical motion
+     h = v0·t + ½gt²  ·  v_td = √(v0²+2gh)  ·  t = (−v0+√(v0²+2gh))/g
+   Curriculum (Art.6): Watch → Predict → Inverse → Bounce Crisis.
+   Prediction LOCKS the Release (Art.1 / Principle 3).
+   Time compression is honest & labelled (AUTO ≈ 10 s wall-clock).
+   NPC: Dr. Mara Costa (ESOC flight director) + PHIL (lander AI).
+   ================================================================ */
+const $=id=>document.getElementById(id);
+const $$=s=>[...document.querySelectorAll(s)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ===== CONSTANTS (SI) ===== */
+const G=1e-3, G_E=9.81, ESC=0.9, MASS=100, DT=0.05;
+const DIFFS={
+  easy:  {hint:3, s2:{h:300,v0:0.10}, s3:{h:200,vt:0.70,win:0.030}, safe:0.85, desc:'generous tolerances'},
+  medium:{hint:4, s2:{h:200,v0:0.15}, s3:{h:300,vt:0.85,win:0.025}, safe:0.70, desc:'normal tolerances'},
+  hard:  {hint:5, s2:{h:140,v0:0.12}, s3:{h:380,vt:0.88,win:0.020}, safe:0.55, desc:'tight tolerances'}
+};
+const STAGE_PTS=[10,30,30,30]; // gold values; silver 80%, bronze 60%
+/* Stage 4 crisis variants — curated pool, re-rolled on retry.
+   Descent scripted (h=250 m), harpoons FAIL (the real 2014 event).
+   v_in = incoming speed, e = restitution → v_b = e·v_in (rebound). */
+const CRISES=[
+  {id:'A', h:250, v0:0.5500, e:0.692, vb:0.6199, escape:false},
+  {id:'B', h:250, v0:0.9571, e:0.800, vb:0.9520, escape:true },
+  {id:'C', h:250, v0:0.8426, e:0.800, vb:0.8800, escape:false}
+];
+const THRUST_DV=0.30;
+
+/* ===== STATE ===== */
+let lang='en', diff='easy', D=DIFFS.easy;
+let stage=0, unlockedMax=0;
+let score=0, hints=0, wrongTotal=0, streak=0;
+let rankFired={r30:false,r60:false,r90:false};
+let stageMedal=[null,null,null,null];      // 'gold'|'silver'|'bronze'|null
+let stagePts=[0,0,0,0];
+let stageWrong=[0,0,0,0];
+let ach={a1:false,a2:false,a3:false,a4:false,a5:false};
+let phase='intro';                          // ready|counting|running|paused|decision|ended
+let veh=null, earthVeh=null, hist=[];
+let stars=[], particles=[];
+let rate=1, rateMode='auto', watchedT=0, simAcc=0;
+let s1Act=0;                                // tutorial act (0 = real time, 1 = compressed)
+let crisis=null, crisisTimer=0, crisisTick=0, crisisApexOK=false, crisisActed=null;
+let pred={t:null,v:null}, planV0=null;
+let activeCheck=null, lastR=null, raf=0, radioIdx=0;
+
+try{unlockedMax=Math.min(3,parseInt(localStorage.getItem('comet_unlocked')||'0')||0);}catch(e){}
+function saveUnlock(){try{localStorage.setItem('comet_unlocked',String(unlockedMax));}catch(e){}}
+
+function theory(h,v0,g=G){const d=v0*v0+2*g*h;if(d<0)return{t:1e9,v:v0};const t=(-v0+Math.sqrt(d))/g;return{t,v:v0+g*t};}
+
+/* ===== I18N (EN first; EL/IT stubs — Charter Art.12: translations are a later pass) ===== */
+const T={
+en:{
+ dial:`<span class="who">DR. MARA COSTA (ESOC flight director):</span> "Rosetta is holding station above comet <span class="em">67P</span>. Philae must separate and fall — but gravity down there is <span class="em">ten thousand times weaker</span> than Earth's."<br><br><span class="who">PHIL (lander AI):</span> "Fun fact: I don't drop. I <span class="em">schedule my arrival</span>. A 1 km fall takes me about 24 minutes."<br><br><span class="who">YOU:</span> "So I compute the fall — time and touchdown speed — <span class="par">before</span> anything is released?"<br><br><span class="who">DR. COSTA:</span> "Exactly. Your numbers unlock the release. In November 2014 the harpoons failed and Philae bounced for two hours. You'll face that too. <span class="par">The comet rewards mathematics, not vibes.</span> 🧠"`,
+ hero:"November 2014: ESA's Rosetta achieved the first comet landing in history. You will re-fly it in four stages — watch, predict, plan, and survive the bounce. The screen shows the SAME drop on Earth and on 67P, side by side. Time compression is always labelled: you watch fast, the physics stays real.",
+ lrn:"Master ONE relationship: uniformly accelerated fall. h = v₀t + ½gt², v_td = √(v₀²+2gh), t = (−v₀+√(v₀²+2gh))/g — used by hand in every stage.",
+ mis:'"Free fall means falling fast." No: free fall means a = local g. On 67P a 1 km drop takes ~24 min and ends at walking pace.',
+ form:`h = v₀·t + ½·g·t²
+t = (−v₀ + √(v₀² + 2gh)) / g
+v_td = v₀ + g·t = √(v₀² + 2gh)
+Eₖ = ½·m·v²   ·   bounce: v_b = e·v_in
+apex after bounce: h = v_b²/(2g)
+g(67P) = 1.0×10⁻³ m/s² · g(Earth) = 9.81 m/s²
+escape ≈ 0.9 m/s (applies to the REBOUND)`,
+ stages:['1. Watch','2. Predict','3. Inverse','4. Bounce Crisis'],
+ go:"🚀 Start mission"
+},
+el:{ hero:"Νοέμβριος 2014: η πρώτη προσεδάφιση σε κομήτη. Θα την ξαναπετάξεις σε 4 στάδια. Η συμπίεση χρόνου δηλώνεται πάντα: βλέπεις γρήγορα, η φυσική μένει αληθινή.",
+ stages:['1. Παρακολούθηση','2. Πρόβλεψη','3. Αντίστροφο','4. Κρίση Αναπήδησης'], go:"🚀 Έναρξη αποστολής"},
+it:{ hero:"Novembre 2014: il primo atterraggio su una cometa. Lo rivolerai in 4 fasi. La compressione temporale è sempre dichiarata.",
+ stages:['1. Osserva','2. Prevedi','3. Inverso','4. Crisi Rimbalzo'], go:"🚀 Inizia missione"}
+};
+function t(k){return T[lang]?.[k]??T.en[k]??k;}
+
+/* ===== AUDIO — canonical IMPLEMENTATION_PATTERNS names ===== */
+let audioCtx=null;
+function ensureAudio(){if(!audioCtx){try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}
+  if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();}
+function playTone(freq,dur,type='sine',vol=0.05){if(!audioCtx)return;try{
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type=type;o.frequency.value=freq;g.gain.value=vol;
+  o.connect(g);g.connect(audioCtx.destination);o.start();
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
+  o.stop(audioCtx.currentTime+dur);}catch(e){}}
+function playNoise(dur,vol=0.05){if(!audioCtx)return;try{
+  const n=audioCtx.sampleRate*dur,buf=audioCtx.createBuffer(1,n,audioCtx.sampleRate);
+  const d=buf.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);
+  const s=audioCtx.createBufferSource(),g=audioCtx.createGain();
+  s.buffer=buf;g.gain.value=vol;s.connect(g);g.connect(audioCtx.destination);s.start();}catch(e){}}
+function sndMissionReady(){ensureAudio();playTone(523,.08);setTimeout(()=>playTone(659,.08),100);setTimeout(()=>playTone(880,.18,'sine',.06),200);}
+function sndCompute(){ensureAudio();playTone(440,.08,'triangle',.05);setTimeout(()=>playTone(659,.12,'triangle',.05),80);}
+function sndNotebookOK(){ensureAudio();[392,494,587,784].forEach((f,i)=>setTimeout(()=>playTone(f,.12,'triangle',.045),i*60));}
+function sndUnlock(){ensureAudio();playTone(523,.1);setTimeout(()=>playTone(659,.1),100);setTimeout(()=>playTone(784,.1),200);setTimeout(()=>playTone(1047,.25,'sine',.06),300);}
+function sndRunStart(){ensureAudio();playTone(880,.15,'sine',.06);setTimeout(()=>playTone(1100,.12,'sine',.05),100);setTimeout(()=>playTone(1320,.1,'sine',.05),200);}
+function sndFanfareGold(){ensureAudio();[523,659,784,988,1319].forEach((f,i)=>setTimeout(()=>{playTone(f,.18,'triangle',.07);playTone(f*2,.18,'sine',.04);},i*110));
+  setTimeout(()=>{for(let i=0;i<8;i++)setTimeout(()=>playTone(2000+Math.random()*1500,.05,'sine',.03),i*40);},600);}
+function sndFanfareSilver(){ensureAudio();[392,494,587].forEach((f,i)=>setTimeout(()=>playTone(f,.2,'triangle',.06),i*120));}
+function sndFanfareBronze(){ensureAudio();playTone(330,.15,'triangle',.05);setTimeout(()=>playTone(440,.25,'triangle',.05),150);}
+function sndFail(){ensureAudio();playTone(330,.15,'sawtooth',.05);setTimeout(()=>playTone(294,.15,'sawtooth',.05),150);setTimeout(()=>playTone(247,.3,'sawtooth',.06),300);}
+function sndBounce(){ensureAudio();playNoise(.12,.08);playTone(180,.25,'triangle',.09);setTimeout(()=>playTone(140,.2,'triangle',.06),110);}
+function sndCountdown(n){ensureAudio();playTone(n===0?1200:600,.12,'sine',.06);}
+
+/* ===== FIREWORKS — canonical ===== */
+let fireworks=[];
+const FW_PALETTES={gold:['#FFD700','#FFEC80','#FFA500','#FFFFFF'],silver:['#E8E8FF','#C0E0FF','#FFFFFF','#A8B8E0'],bronze:['#E89B5F','#D17030','#FFC890','#FFFFFF']};
+function launchFireworks(cx,cy,palette){const colors=FW_PALETTES[palette]||FW_PALETTES.gold,n=60;
+  for(let i=0;i<n;i++){const a=(Math.PI*2*i/n)+Math.random()*.2,s=2+Math.random()*3.5;
+    fireworks.push({x:cx,y:cy,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:50+Math.random()*40,maxLife:90,
+      color:colors[Math.floor(Math.random()*colors.length)],size:1.5+Math.random()*2.5,twinkle:Math.random()<.3});}}
+function updateFireworks(){fireworks=fireworks.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.06;p.vx*=.985;p.vy*=.99;p.life--;return p.life>0;});}
+function drawFireworksCanvas(){const c=$('fwCanvas');if(!c)return;
+  if(c.width!==innerWidth)c.width=innerWidth;if(c.height!==innerHeight)c.height=innerHeight;
+  const ctx=c.getContext('2d');ctx.clearRect(0,0,c.width,c.height);updateFireworks();
+  for(const p of fireworks){const a=Math.max(0,p.life/p.maxLife),f=p.twinkle?(.6+.4*Math.random()):1;
+    const h=p.color.substring(1),r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);
+    ctx.fillStyle=`rgba(${r},${g},${b},${a*.25*f})`;ctx.beginPath();ctx.arc(p.x,p.y,p.size*3,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=`rgba(${r},${g},${b},${a*f})`;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();}}
+function celebrate(level){const W=innerWidth,H=innerHeight;
+  if(level==='gold'){sndFanfareGold();launchFireworks(W*.5,H*.3,'gold');setTimeout(()=>launchFireworks(W*.3,H*.35,'gold'),350);
+    setTimeout(()=>launchFireworks(W*.7,H*.35,'silver'),600);setTimeout(()=>launchFireworks(W*.5,H*.45,'gold'),900);}
+  else if(level==='silver'){sndFanfareSilver();launchFireworks(W*.5,H*.35,'silver');setTimeout(()=>launchFireworks(W*.4,H*.4,'silver'),400);}
+  else if(level==='bronze'){sndFanfareBronze();launchFireworks(W*.5,H*.4,'bronze');}
+  else sndFail();}
+
+/* ===== toast / typewriter radio ===== */
+let toastT=0;function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('show'),6000);}
+let radioT=0,radioTyper=0;
+function radio(m){const e=$('radio');clearTimeout(radioT);clearInterval(radioTyper);
+  const full='📡 '+m;let i=0;e.textContent='';e.classList.add('on');
+  radioTyper=setInterval(()=>{i+=2;e.textContent=full.slice(0,i);
+    if(i>=full.length){clearInterval(radioTyper);radioT=setTimeout(()=>e.classList.remove('on'),8400);}},16);}
+
+/* ===== easter eggs ===== */
+function eggCheck(raw){
+  if(raw==='42'||parseFloat(raw)===42){toast('🥚 42 — the answer to everything except this input field.');return;}
+  if(Math.abs(parseFloat(raw)-0.67)<0.005){toast('🥚 0.67 — a tribute to comet 67P itself!');}
+}
+
+/* ===== scoring ===== */
+function wrongAttempt(fb,el,msg){
+  const pen=(diff==='easy'?1:2);
+  stageWrong[stage]++;wrongTotal++;score=Math.max(0,score-pen);
+  $('tsAtt').textContent=wrongTotal;setScore();
+  if(el)el.classList.add('error');
+  if(fb)fb.innerHTML='<span class="bad">'+msg+' (−'+pen+' pts)</span>'+(stageWrong[stage]>=3?' <span class="warn">Stuck? Press H for a hint — it now stays on screen.</span>':'');
+  sndFail();
+}
+function setScore(){$('tsScore').textContent=score;
+  const s=$('tsScore');s.classList.remove('score-pop');void s.offsetWidth;s.classList.add('score-pop');
+  const ranks=[[30,'r30','Comet Cadet → Flight Dynamics Officer'],[60,'r60','→ Trajectory Specialist'],[90,'r90','→ Comet Whisperer 🏆']];
+  for(const[th,key,name]of ranks){if(score>=th&&!rankFired[key]){rankFired[key]=true;setTimeout(()=>{toast('⭐ RANK UP: '+name);sndUnlock();},700);}}}
+function awardStage(medal){
+  const mult={gold:1,silver:.8,bronze:.6}[medal]||0;
+  const pts=Math.round(STAGE_PTS[stage]*mult);
+  if(pts>stagePts[stage]){score+=pts-stagePts[stage];stagePts[stage]=pts;setScore();}
+  if(medal&&(!stageMedal[stage]||{gold:3,silver:2,bronze:1}[medal]>({gold:3,silver:2,bronze:1}[stageMedal[stage]]||0)))stageMedal[stage]=medal;
+  if(medal){unlockedMax=Math.max(unlockedMax,Math.min(3,stage+1));saveUnlock();}
+  if(stageWrong[stage]===0&&medal){streak++;if(streak>=2)toast('🔥 STREAK ×'+streak+' — flawless!');}
+  else if(!medal)streak=0;
+  $('tsStreak').textContent=streak;
+}
+
+/* ===== hints (strategy only — Art.7) ===== */
+const HINTS={
+ 0:['Watch the clocks: MISSION time vs WATCHED time. The banner tells you the compression factor.','Both landers share v₀ and h. Only ONE thing differs between the panels. Which symbol in the formula is it?','On Earth the fall ends in ~14 s. On 67P, hours. Same equation.'],
+ 1:['t = (−v₀ + √(v₀² + 2gh)) / g. Substitute YOUR mission values — g = 0.001, careful with the square root.','v_td = v₀ + g·t, or directly √(v₀² + 2gh). Both must agree — use one to check the other.','Sanity check: expect hundreds of seconds and under 1 m/s. If you got 14 s, you used Earth g.'],
+ 2:['Work backwards: v_td² = v₀² + 2gh → v₀ = √(v_td² − 2gh).','Compute 2gh first. Subtract it from the target² . THEN take the square root.','If v_td² < 2gh the plan is impossible from that height — check before you commit.'],
+ 3:['Escape check first: compare the REBOUND speed with 0.9 m/s. Above it, Philae never returns.','Apex of the bounce: h = v_b²/(2g). With g = 0.001, even slow bounces fly HIGH.','If it escapes, the thruster gives Δv = −0.30 m/s. Recompute v_b after the burn, then the new apex.']
+};
+function useHint(){ensureAudio();
+  const hs=HINTS[stage]||['Trust the formula sheet.'];
+  const h=hs[hints%hs.length];hints++;score=Math.max(0,score-D.hint);
+  $('tsHints').textContent=hints;setScore();
+  toast('💡 Hint (−'+D.hint+' pts)');showHintBar(h);radio('Dr. Costa: '+h.replace('💡',''));playTone(440,.08,'triangle',.06);}
+
+/* ===== INSIGHT LAYER — canonical MCQ gates ===== */
+const INSIGHTS={
+ 0:{q:'Both landers were released at the same instant, same height, same v₀. Why does the Earth one crash in seconds while the comet one crawls?',
+    opts:[
+     {t:'acceleration equals the local g — Earth pulls ~10,000× harder on the very same lander',ok:true},
+     {t:'the lander weighs less on the comet, and lighter objects fall slower',why:'Lighter objects do NOT fall slower — free-fall acceleration is independent of mass (Galileo). The lander\'s mass never changed anyway; g did.'},
+     {t:'air resistance slows the comet lander down',why:'67P has essentially no atmosphere — nothing to resist. (And our Earth panel neglects air too, as stated in the model.)'},
+     {t:'the Earth lander was released with a bigger push',why:'Identical v₀ by construction — check the setup. The ONLY difference between the panels is g.'}],
+    law:'⚖️ Law of the case: in free fall, a = g_local. Same object, same equation — the planet chooses the number.'},
+ 1:{q:'Estimate BEFORE calculating: g on 67P is 10,000× weaker than Earth\'s. A drop from the same height (v₀≈0) takes roughly how much longer?',
+    opts:[
+     {t:'about 100× longer',ok:true},
+     {t:'about 10,000× longer',why:'Tempting — but t = √(2h/g). The g sits under a SQUARE ROOT: 10,000× weaker g → √10,000 = 100× longer, not 10,000×.'},
+     {t:'about 10× longer',why:'That would need g only 100× weaker. Here it is 10,000× weaker → √10,000 = 100×.'},
+     {t:'the same time — free fall is free fall',why:'Fall time depends directly on g: t = √(2h/g). Different g, different clock.'}],
+    law:'⚖️ Law of the case: t = √(2h/g) — time scales as 1/√g. Weakening gravity 10,000× only slows the fall 100×. Estimate first; the calculator confirms.'},
+ 2:{q:'Think before planning: from rest, you want HALF the touchdown speed. You must release from…',
+    opts:[
+     {t:'one quarter of the height',ok:true},
+     {t:'one half of the height',why:'v_td = √(2gh) — the square root strikes again. Half the height gives 1/√2 ≈ 0.71 of the speed, not half.'},
+     {t:'one eighth of the height',why:'That would give √(1/8) ≈ 0.35 of the speed — you overshot. v ∝ √h means half speed ⇒ quarter height.'},
+     {t:'the same height with a smaller lander',why:'Mass does not appear in v_td = √(2gh). Free fall doesn\'t care what\'s falling.'}],
+    law:'⚖️ Law of the case: v_td ∝ √h. Halving v needs quartering h — which is why today you\'ll adjust v₀ instead: v₀ = √(v_td² − 2gh).'},
+ 3:{q:'Philae rebounds UPWARD at 0.6 m/s. On Earth that bounce rises ~2 cm. On 67P (g 10,000× weaker) it rises…',
+    opts:[
+     {t:'about 10,000× higher — nearly 200 metres',ok:true},
+     {t:'about 100× higher',why:'Apex h = v²/(2g) — here g is NOT under a square root. 10,000× weaker g → 10,000× higher apex.'},
+     {t:'the same height — energy is energy',why:'Kinetic energy converts to m·g·h. With tiny g, the same energy buys enormous h: h = v²/(2g).'},
+     {t:'it cannot rise, comets have no bounce',why:'It bounced for two real hours in 2014 — that is precisely today\'s crisis. Hard surface + weak gravity = trampoline.'}],
+    law:'⚖️ Law of the case: apex h = v_b²/(2g) ∝ 1/g. And if v_b ≥ 0.9 m/s (escape), there is no apex at all — Philae leaves forever.'}
+};
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function appendWhyCorrect(box,spec){
+  const c=spec.opts.find(o=>o.ok);if(!c)return;
+  const w=document.createElement('div');w.className='whycorrect';
+  w.innerHTML='<div class="wc-head">✓ Correct answer — here’s why</div><div class="wc-opt">“'+c.t+'”</div><div class="wc-law">'+spec.law+'</div>';
+  box.appendChild(w);}
+function showHintBar(txt){const b=$('hintBar');if(!b)return;const el=$('hintBarText');if(el)el.innerHTML='💡 '+txt;b.classList.remove('hidden');}
+function hideHintBar(){const b=$('hintBar');if(b)b.classList.add('hidden');}
+function buildMCQ(container,idx,onPass,alreadyDone){
+  const spec=INSIGHTS[idx];
+  const box=document.createElement('div');box.className='insight';
+  box.innerHTML=`<h3>🧠 Insight check — reasoning unlocks the numbers</h3><div class="q">${spec.q}</div>`;
+  const opts=shuffle(spec.opts.slice());let solved=false,wrongN=0;
+  opts.forEach(o=>{const b=document.createElement('button');b.className='mcq-opt';b.textContent=o.t;
+    b.addEventListener('click',()=>{ensureAudio();if(solved)return;
+      if(o.ok){solved=true;b.classList.add('right');
+        box.querySelectorAll('.mcq-opt').forEach(x=>x.disabled=true);
+        appendWhyCorrect(box,spec);
+        sndNotebookOK();onPass();
+      }else{b.classList.add('wrong');b.disabled=true;wrongN++;const free=(diff==='easy'&&wrongN===1);if(free){sndFail();}else{wrongAttempt(null,null,'');}
+        let fb=box.querySelector('.mcq-fb');
+        if(!fb){fb=document.createElement('div');fb.className='mini mcq-fb';fb.style.marginTop='6px';box.appendChild(fb);}
+        fb.innerHTML='<span class="bad">✗ '+o.why+(free?' (no penalty on Easy — try again)':' (−'+(diff==='easy'?1:2)+' pts)')+'</span>';}});
+    box.appendChild(b);});
+  if(alreadyDone){solved=true;
+    box.querySelectorAll('.mcq-opt').forEach(x=>{x.disabled=true;if(spec.opts.find(o=>o.ok&&o.t===x.textContent))x.classList.add('right');});
+    appendWhyCorrect(box,spec);
+    setTimeout(onPass,0);
+  }else{const note=document.createElement('div');note.className='gate-note';note.textContent='🔒 The stage controls unlock when you answer correctly.';box.appendChild(note);}
+  container.appendChild(box);
+}
+
+/* ===== stage bar ===== */
+function buildStageBar(){const bar=$('stageBar');bar.innerHTML='';
+  t('stages').forEach((name,i)=>{const b=document.createElement('button');
+    const locked=i>unlockedMax;
+    b.className='stbtn'+(i===stage?' active':'')+(stageMedal[i]?' done':'')+(locked?' locked':'');
+    b.textContent=name+(stageMedal[i]?' '+({gold:'🥇',silver:'🥈',bronze:'🥉'}[stageMedal[i]]):'');
+    b.addEventListener('click',()=>{if(!locked)setStage(i);else toast('🔒 Bronze+ on the previous stage unlocks this.');});
+    bar.appendChild(b);});}
+function setStage(s){stage=s;$('tsStage').textContent=(s+1)+'/4';activeCheck=null;phase='ready';hideHintBar();if(diff==='easy'&&typeof HINTS!=='undefined'&&HINTS[s]&&s>0){setTimeout(()=>showHintBar('Scaffold (free on Easy): '+HINTS[s][0]),60);}
+  clearInterval(crisisTick);
+  veh=null;earthVeh=null;hist=[];particles=[];pred={t:null,v:null};planV0=null;crisis=null;
+  buildStageBar();buildSide();draw();sndCompute();}
+
+/* ===== HONEST TIME COMPRESSION =====
+   rate = mission-seconds per watched-second. Always labelled on canvas. */
+function computeAutoRate(h,v0){const th=theory(h,v0);return clamp(Math.round(th.t/10),1,2000);}
+function currentRate(){
+  let r=rate;
+  if(veh&&veh.y<15&&r>30&&!veh.landed&&!veh.lost&&veh.vy>0)r=30; // final-approach slow-mo (still labelled)
+  return r;
+}
+
+/* ===== SIM ===== */
+function makeVeh(h,v0){return{y:h,vy:v0,t:0,h0:h,bounces:0,landed:false,lost:false,anchored:false,apex:0,maxV:v0};}
+function step(dt){
+  if(!veh)return;
+  veh.vy+=G*dt;veh.y-=veh.vy*dt;veh.t+=dt;
+  veh.maxV=Math.max(veh.maxV,Math.abs(veh.vy));
+  if(veh.vy<0)veh.apex=Math.max(veh.apex,veh.y);
+  if(earthVeh&&earthVeh.y>0){earthVeh.vy+=G_E*dt;earthVeh.y-=earthVeh.vy*dt;earthVeh.t+=dt;earthVeh.maxV=Math.max(earthVeh.maxV,earthVeh.vy);if(earthVeh.y<=0){earthVeh.y=0;}}
+  if(hist.length===0||veh.t-hist[hist.length-1].t>Math.max(1,veh.h0/400))hist.push({t:veh.t,y:Math.max(0,veh.y),vy:veh.vy});
+  if(veh.y<=0&&veh.vy>0)groundContact();
+}
+function groundContact(){
+  veh.y=0;
+  const cvs=$('C'),gY=cvs.height*.83,cX=cvs.width*.6*.4;
+  if(stage===3&&veh.bounces===0){ // scripted harpoon failure → CRISIS
+    veh.bounces=1;const vb=crisis.e*veh.vy;
+    addParticles(cX,gY,18,'#ffaa44',4,30);sndBounce();
+    $('stageWrap').classList.add('shaking');setTimeout(()=>$('stageWrap').classList.remove('shaking'),400);
+    veh.vy=-vb;veh.y=0.5;
+    phase='decision';crisisTimer=60;crisisApexOK=false;crisisActed=null;
+    radio('PHIL: ⚠ HARPOONS FAILED TO FIRE. I am airborne again at '+vb.toFixed(3)+' m/s. Just like 2014. Your call, boss.');
+    buildDecisionPanel();return;
+  }
+  if(stage===3&&veh.bounces>=1){ // second contact: ice screws anchor any sub-escape return
+    veh.landed=true;veh.anchored=true;addParticles(cX,gY,20,'#aaddaa',3,40);sndNotebookOK();finishStage4();return;
+  }
+  if(stage===2){ // harpoon window
+    const dv=Math.abs(veh.vy-D.s3.vt);
+    if(dv<=D.s3.win){veh.landed=true;veh.anchored=true;addParticles(cX,gY,20,'#aaddaa',3,40);}
+    else if(veh.vy>=ESC*1.6){veh.lost=true;} // catastrophic impact speed
+    else{veh.bounces++;addParticles(cX,gY,15,'#ffaa44',4,30);sndBounce();veh.landed=false;}
+    finishStage3();return;
+  }
+  if(stage===0){ // tutorial: observation probe — any contact is touchdown
+    veh.landed=true;addParticles(cX,gY,20,'#aaddaa',3,40);sndNotebookOK();finishStage1();return;
+  }
+  // stage 1 (Predict): plain landing check
+  if(veh.vy<=D.safe){veh.landed=true;addParticles(cX,gY,20,'#aaddaa',3,40);}
+  else{veh.bounces++;const vb=0.6*veh.vy;
+    if(vb>=ESC){veh.lost=true;}
+    else{veh.vy=-vb;veh.y=0.5;sndBounce();toast('🏀 Bounce! rebound '+vb.toFixed(2)+' m/s');
+      $('stageWrap').classList.add('shaking');setTimeout(()=>$('stageWrap').classList.remove('shaking'),400);return;}}
+  finishStage2();
+}
+function addParticles(x,y,count,color,spread,life){
+  for(let i=0;i<count;i++)particles.push({x,y,vx:(Math.random()-.5)*spread,vy:(Math.random()-.8)*spread,life:life+Math.random()*life*.5,maxLife:life,color,r:Math.random()*3+1});}
+function updateParticles(dt){particles=particles.filter(p=>{p.x+=p.vx*dt*60;p.y+=p.vy*dt*60;p.vy+=.02;p.life-=dt*60;return p.life>0;});}
+
+/* ===== RADIO SCRIPT (PHIL personality + 3 physics jokes) ===== */
+const RADIO_POOL=[
+ "PHIL: Separation confirmed. Hello, comet! 👋",
+ "Dr. Costa: Telemetry nominal. Enjoy the slowest skydive in history.",
+ "PHIL: I'm not falling slowly — gravity here is just extremely polite.",           // joke 1
+ "Dr. Costa: On 67P you don't drop things. You schedule their arrival.",             // joke 2
+ "PHIL: Surface features visible. Dust, ice, and zero welcome committee.",
+ "PHIL: My escape velocity is a brisk walk. Please, nobody sneeze.",                 // joke 3
+ "Dr. Costa: Watch the approach speed. The comet forgives nothing above the limit.",
+ "PHIL: Contact soon. Deploying optimism."
+];
+function tickRadio(){
+  if(phase!=='running'||!veh||stage===3&&veh.bounces>0)return;
+  const progress=1-veh.y/Math.max(veh.h0,1);
+  const idx=Math.floor(progress*RADIO_POOL.length);
+  if(idx>radioIdx&&idx<RADIO_POOL.length){radioIdx=idx;radio(RADIO_POOL[idx]);playTone(800,.05,'sine',.03);}
+}
+
+/* ===== CANVAS ===== */
+function resizeC(){const c=$('C'),b=c.parentElement.getBoundingClientRect();
+  c.width=Math.max(400,Math.floor(b.width*devicePixelRatio));c.height=Math.max(260,Math.floor(b.height*devicePixelRatio));
+  stars=[];for(let i=0;i<170;i++)stars.push({x:Math.random()*c.width,y:Math.random()*c.height*.7,r:Math.random()*1.6+.3,a:Math.random()*.4+.1,w:Math.random()*6});draw();}
+function draw(){
+  const c=$('C');if(!c||!c.width)return;const cx=c.getContext('2d'),W=c.width,H=c.height,now=Date.now()*.001,dpr=devicePixelRatio;
+  cx.clearRect(0,0,W,H);
+  const bg=cx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#020510');bg.addColorStop(.55,'#0a0820');bg.addColorStop(1,'#1c0e12');cx.fillStyle=bg;cx.fillRect(0,0,W,H);
+  stars.forEach(s=>{cx.globalAlpha=s.a+.1*Math.sin(now*1.2+s.w);cx.fillStyle='#fff';cx.beginPath();cx.arc(s.x,s.y,s.r,0,Math.PI*2);cx.fill();});cx.globalAlpha=1;
+  const MID=W*.6, gY=H*.83, eGY=H*.83;
+  cx.strokeStyle='rgba(255,255,255,.1)';cx.lineWidth=1;cx.setLineDash([4,6]);cx.beginPath();cx.moveTo(MID,0);cx.lineTo(MID,H);cx.stroke();cx.setLineDash([]);
+  cx.fillStyle='rgba(176,140,255,.65)';cx.font=`bold ${12*dpr}px ui-monospace`;cx.fillText('☄️ COMET 67P  (g = 0.001 m/s²)',14*dpr,20*dpr);
+  cx.fillStyle='rgba(107,224,255,.65)';cx.fillText('🌍 EARTH  (g = 9.81 m/s²)',MID+10*dpr,20*dpr);
+  // comet ground
+  cx.fillStyle='#28201a';cx.beginPath();cx.moveTo(0,gY);for(let x=0;x<=MID;x+=10)cx.lineTo(x,gY-5*Math.sin(x*.01)-3*Math.cos(x*.025+1));cx.lineTo(MID,H);cx.lineTo(0,H);cx.fill();
+  cx.fillStyle='#362a20';for(let i=0;i<5;i++){cx.beginPath();cx.ellipse(MID*(.1+i*.2),gY+5+i*2,18+i*6,3+i,.2*i,0,Math.PI*2);cx.fill();}
+  for(let j=0;j<2;j++){const jx=MID*(.25+.5*j)+20*Math.sin(now*.4+j*2),jy=gY-5;const jg=cx.createLinearGradient(jx,jy,jx,jy-55);jg.addColorStop(0,'rgba(180,200,220,.08)');jg.addColorStop(1,'transparent');cx.fillStyle=jg;cx.beginPath();cx.moveTo(jx-5,jy);cx.lineTo(jx-12,jy-50);cx.lineTo(jx+12,jy-50);cx.lineTo(jx+5,jy);cx.fill();}
+  cx.fillStyle='#bbb';cx.fillRect(MID*.35-5,H*.05,10,4);cx.fillStyle='rgba(80,120,200,.6)';cx.fillRect(MID*.35-16,H*.05+1,10,2);cx.fillRect(MID*.35+7,H*.05+1,10,2);
+  cx.fillStyle='rgba(255,255,255,.35)';cx.font=`${8*dpr}px ui-monospace`;cx.fillText('Rosetta',MID*.35+20,H*.05+4);
+  // Earth side
+  const sky=cx.createLinearGradient(MID,H*.3,MID,eGY);sky.addColorStop(0,'rgba(60,120,220,.15)');sky.addColorStop(1,'rgba(60,140,100,.08)');cx.fillStyle=sky;cx.fillRect(MID,H*.3,W-MID,eGY-H*.3);
+  cx.fillStyle='#1a3a1a';cx.fillRect(MID,eGY,W-MID,H-eGY);
+  // vehicles
+  if(veh){
+    const fr=clamp(veh.y/Math.max(veh.h0*1.05,10),0,1);
+    const cY=gY-fr*(gY-H*.1),cX2=MID*.4;
+    if(phase==='running'||phase==='paused'||phase==='decision'){cx.setLineDash([3,6]);cx.strokeStyle='rgba(107,224,255,.12)';cx.beginPath();cx.moveTo(cX2,cY+14);cx.lineTo(cX2,gY);cx.stroke();cx.setLineDash([]);}
+    drawPhilae(cx,cX2,cY,1);
+    cx.fillStyle='rgba(200,215,255,.75)';cx.font=`${10*dpr}px ui-monospace`;
+    cx.fillText('h = '+Math.max(0,veh.y).toFixed(1)+' m',cX2+34,cY);
+    cx.fillText('v = '+veh.vy.toFixed(3)+' m/s'+(veh.vy<0?' ↑':''),cX2+34,cY+13*dpr);
+    if(veh.bounces>0){cx.fillStyle='rgba(255,170,85,.85)';cx.fillText('bounces: '+veh.bounces,cX2+34,cY+26*dpr);}
+    if(earthVeh){
+      const eFr=clamp(earthVeh.y/Math.max(veh.h0*1.05,10),0,1);
+      const eY=eGY-eFr*(eGY-H*.1),eX=MID+(W-MID)*.4;
+      drawPhilae(cx,eX,eY,.8);
+      if(earthVeh.y<=0){cx.fillStyle='rgba(255,112,112,.85)';cx.font=`bold ${12*dpr}px ui-monospace`;
+        cx.fillText('💥 CRASHED',eX-32,eY-24);
+        cx.fillText('t = '+earthVeh.t.toFixed(1)+' s',eX-32,eY-10);
+        cx.fillText('v = '+earthVeh.maxV.toFixed(0)+' m/s',eX-32,eY+4);}
+      else{cx.fillStyle='rgba(200,230,255,.6)';cx.font=`${9*dpr}px ui-monospace`;
+        cx.fillText('h='+earthVeh.y.toFixed(0)+' m',eX+30,eY);cx.fillText('v='+earthVeh.vy.toFixed(0)+' m/s',eX+30,eY+12*dpr);}
+    }
+  }
+  /* ===== HONEST TIME BANNER + DUAL CLOCK (always when compressed) ===== */
+  if(phase==='running'||phase==='paused'){
+    const r=currentRate();
+    if(r>1){
+      const bw=Math.min(W*.66,460*dpr),bx=(W-bw)/2,by=28*dpr;
+      cx.beginPath();
+      if(cx.roundRect)cx.roundRect(bx,by,bw,34*dpr,10*dpr);else cx.rect(bx,by,bw,34*dpr);
+      cx.fillStyle='rgba(0,0,0,.55)';cx.fill();
+      cx.strokeStyle='rgba(255,209,102,.5)';cx.lineWidth=1;cx.stroke();
+      cx.fillStyle='#ffd166';cx.font=`bold ${11*dpr}px ui-monospace`;cx.textAlign='center';
+      const tag=(veh&&veh.y<15&&rate>30&&veh.vy>0)?'FINAL APPROACH · ':'';
+      cx.fillText('⏩ '+tag+'TIME ×'+r+' — 1 s on screen = '+r+' s of mission',W/2,by+14*dpr);
+      cx.fillStyle='rgba(230,240,255,.85)';cx.font=`${10*dpr}px ui-monospace`;
+      cx.fillText('MISSION '+fmtT(veh?veh.t:0)+'   ·   WATCHED '+watchedT.toFixed(1)+' s',W/2,by+27*dpr);
+      cx.textAlign='left';
+    } else {
+      cx.fillStyle='rgba(107,224,255,.7)';cx.font=`bold ${11*dpr}px ui-monospace`;cx.textAlign='center';
+      cx.fillText('▶ REAL TIME 1× — this is the actual pace of physics',W/2,40*dpr);cx.textAlign='left';
+    }
+  }
+  // g comparison bar
+  cx.fillStyle='rgba(0,0,0,.3)';cx.fillRect(8*dpr,H-40*dpr,MID-16*dpr,32*dpr);
+  cx.fillStyle='rgba(255,255,255,.45)';cx.font=`${8*dpr}px ui-monospace`;cx.fillText('g: Earth vs 67P',12*dpr,H-30*dpr);
+  const barW=MID-32*dpr;
+  cx.fillStyle='rgba(107,224,255,.4)';cx.fillRect(12*dpr,H-24*dpr,barW,5*dpr);
+  cx.fillStyle='rgba(176,140,255,.9)';cx.fillRect(12*dpr,H-24*dpr,Math.max(2,barW*G/G_E),5*dpr);
+  cx.fillText('← 67P (invisible at this scale!)',12*dpr,H-12*dpr);
+  // particles
+  particles.forEach(p=>{cx.globalAlpha=clamp(p.life/p.maxLife,0,1);cx.fillStyle=p.color;cx.beginPath();cx.arc(p.x,p.y,p.r,0,Math.PI*2);cx.fill();});cx.globalAlpha=1;
+}
+function fmtT(s){return s<120?s.toFixed(1)+' s':(s/60).toFixed(1)+' min';}
+function drawPhilae(cx,x,y,scale){
+  cx.save();cx.translate(x,y);cx.scale(scale,scale);
+  cx.fillStyle='#e8ddd0';cx.strokeStyle='#7a6a5a';cx.lineWidth=2;
+  cx.beginPath();cx.moveTo(-12,-14);cx.lineTo(12,-14);cx.lineTo(16,6);cx.lineTo(-16,6);cx.closePath();cx.fill();cx.stroke();
+  cx.fillStyle='#bbb';cx.fillRect(-4,-18,8,4);cx.fillStyle='#888';cx.fillRect(-2,-22,4,4);
+  cx.strokeStyle='#aaa';cx.lineWidth=1.5;
+  [[-16,6,-22,18],[16,6,22,18],[-8,6,-10,20],[8,6,10,20]].forEach(([a,b,c2,d])=>{cx.beginPath();cx.moveTo(a,b);cx.lineTo(c2,d);cx.stroke();});
+  cx.fillStyle='rgba(50,70,150,.85)';cx.fillRect(-38,-10,18,8);cx.fillRect(20,-10,18,8);
+  cx.restore();
+}
+
+/* ===== SIDE PANEL — progressive disclosure per stage (Art.5: ≤3 cards) ===== */
+function buildSide(){
+  const sp=$('sidePanel');sp.innerHTML='';
+  const done=!!stageMedal[stage];
+  if(stage===0)buildS1(sp);
+  else if(stage===1)buildS2(sp,done);
+  else if(stage===2)buildS3(sp,done);
+  else buildS4(sp);
+}
+
+/* ---- STAGE 1: WATCH ---- */
+let s1McqOK=false,s1Watched=false;
+function buildS1(sp){
+  s1McqOK=!!stageMedal[0];s1Watched=!!stageMedal[0];
+  sp.innerHTML=`
+  <div class="block"><h3>🎬 Stage 1 — Watch the same drop, twice</h3>
+    <div class="mini">Two identical landers, released together from <b>1000 m</b>, v₀ = 0. Left: comet 67P. Right: Earth. First you watch in <b>real time</b> (Earth ends fast). Then we engage labelled time compression so the comet fall finishes in ~9 s of watching.</div>
+    <button class="btn go" id="bWatch" style="margin-top:8px;width:100%">▶ Release both landers</button>
+    <div class="mini" id="s1Status" style="margin-top:5px"></div>
+  </div>
+  <div id="s1Mcq"></div>
+  <button class="btn pri" id="s1Done" style="width:100%" disabled>Complete Stage 1 →</button>`;
+  buildMCQ($('s1Mcq'),0,()=>{s1McqOK=true;chkS1();},!!stageMedal[0]);
+  $('bWatch').onclick=()=>{if(phase==='running'||phase==='counting')return;ensureAudio();startS1Run();};
+  $('s1Done').onclick=()=>{awardStage('gold');ach.a5=ach.a5;buildStageBar();
+    toast('✅ Stage 1 complete! +10 pts');sndUnlock();radio('Dr. Costa: You SAW it. Now you\'ll predict it. Stage 2 is open.');
+    setTimeout(()=>setStage(1),1200);};
+  function chkS1(){if(s1McqOK&&s1Watched)$('s1Done').disabled=false;}
+  window._chkS1=chkS1;
+}
+function startS1Run(){
+  veh=makeVeh(1000,0);earthVeh={y:1000,vy:0,t:0,maxV:0};hist=[];radioIdx=0;watchedT=0;simAcc=0;
+  s1Act=0;rate=1;phase='counting';
+  countdown(()=>{phase='running';sndRunStart();radio('PHIL: Released. Earth-me is about to have a very short day.');
+    $('s1Status').innerHTML='<span class="warn">▶ REAL TIME — watch the Earth panel…</span>';});
+}
+function s1Tick(){
+  if(stage!==0||phase!=='running')return;
+  if(s1Act===0&&veh.t>=15.5){
+    s1Act=1;rate=Math.round((1414.2-15.5)/9); // remaining mission seconds shown in ~9 s of watching
+    toast('⏩ ENGAGING TIME COMPRESSION ×'+rate);sndUnlock();
+    radio('Dr. Costa: Earth version: over in 14 s at 140 m/s. Comet version: fasten your patience — compressing time ×'+rate+'.');
+    $('s1Status').innerHTML='<span class="good">Earth crashed (t=14.3 s, v=140 m/s). Comet lander barely moved. ⏩ compression engaged ×'+rate+'</span>';
+  }
+}
+function finishStage1(){
+  phase='ended';s1Watched=true;
+  toast('🛬 Comet touchdown: t='+veh.t.toFixed(0)+' s ('+(veh.t/60).toFixed(1)+' min), v='+Math.abs(veh.vy).toFixed(3)+' m/s');
+  radio('PHIL: Touchdown at walking pace after '+(veh.t/60).toFixed(0)+' minutes. Earth-me sends condolences from a crater.');
+  if(window._chkS1)window._chkS1();
+  buildSide();$('s1Status').innerHTML='<span class="good">✅ Watched: comet t≈'+(veh.t/60).toFixed(1)+' min vs Earth 14.3 s — answer the insight check.</span>';
+  s1Watched=true;if(s1McqOK)$('s1Done').disabled=false;
+}
+
+/* ---- STAGE 2: PREDICT (numbers unlock Release) ---- */
+function buildS2(sp,done){
+  const P=D.s2, th=theory(P.h,P.v0);
+  sp.innerHTML=`
+  <div class="block"><h3>📋 Stage 2 — Predict, then release ${stageWrong[1]?'<span class="att-badge">wrong: '+stageWrong[1]+'</span>':''}</h3>
+    <div class="mini">Mission parameters (fixed — no sliders, no fiddling):</div>
+    <div class="sr"><div class="k">Release altitude h</div><div class="v">${P.h} m</div></div>
+    <div class="sr"><div class="k">Push velocity v₀ (down)</div><div class="v">${P.v0.toFixed(2)} m/s</div></div>
+    <div class="sr"><div class="k">g (67P)</div><div class="v">1.0×10⁻³ m/s²</div></div>
+    <div class="sr"><div class="k">Safe touchdown</div><div class="v">&lt; ${D.safe.toFixed(2)} m/s</div></div>
+  </div>
+  <div id="s2Mcq"></div>
+  <div class="block"><h3>🔒 Prediction locks the Release</h3>
+    <div class="nb-step"><span class="step-num">1</span><span class="step-text">Fall time t = (−v₀+√(v₀²+2gh))/g</span>
+      <div style="margin-top:4px;display:flex;gap:8px;align-items:center"><span class="mini">t (s):</span><input class="numInput" id="pT" type="number" step="0.1" placeholder="___" disabled/></div></div>
+    <div class="nb-step"><span class="step-num">2</span><span class="step-text">Touchdown speed v = √(v₀²+2gh)</span>
+      <div style="margin-top:4px;display:flex;gap:8px;align-items:center"><span class="mini">v (m/s):</span><input class="numInput" id="pV" type="number" step="0.001" placeholder="_.___" disabled/></div></div>
+    <button class="btn go" id="bCommit" style="width:100%;margin-top:4px" disabled>📝 Commit prediction</button>
+    <div class="mini" id="s2Fb" style="margin-top:5px"></div>
+    <button class="btn pri" id="bRun" style="width:100%;margin-top:6px" disabled>🚀 Release (locked)</button>
+  </div>
+  <div class="block"><h3>⏩ Playback speed (honest labels)</h3>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn" data-rm="real">1× real (~${(th.t/60).toFixed(0)} min — physics is patient)</button>
+      <button class="btn pri" data-rm="auto">AUTO ≈10 s (×${computeAutoRate(P.h,P.v0)})</button>
+    </div>
+    <div class="mini" style="margin-top:4px">The banner on screen always shows the exact compression. The physics is never altered — only how fast you watch it.</div>
+  </div>`;
+  let mcqOK=done, committed=done;
+  buildMCQ($('s2Mcq'),1,()=>{mcqOK=true;['pT','pV','bCommit'].forEach(id=>$(id).disabled=false);
+    if(!done)radio('Dr. Costa: √-scaling understood. Now put exact numbers on it.');},done);
+  const doCommit=()=>{ensureAudio();
+    if($('bCommit').disabled)return;
+    const rt=$('pT').value,rv=$('pV').value;eggCheck(rt);eggCheck(rv);
+    const a=parseFloat(rt),b=parseFloat(rv);
+    if(isNaN(a)||isNaN(b)){wrongAttempt($('s2Fb'),null,'Both numbers, please — a prediction with holes is a guess.');return;}
+    if(a<=0||b<=0){wrongAttempt($('s2Fb'),$('pT'),'Positive values. Falling takes time; arriving takes speed.');return;}
+    // sanity gates that CATCH the classic errors without revealing the answer
+    if(a<60){wrongAttempt($('s2Fb'),$('pT'),'That t belongs to Earth gravity. You are on 67P — check which g you used.');return;}
+    if(b>ESC*2){wrongAttempt($('s2Fb'),$('pV'),'That speed would vaporise Philae. Re-check: v = √(v₀²+2gh) with g = 0.001.');return;}
+    committed=true;pred={t:a,v:b};
+    $('pT').classList.remove('error');$('pV').classList.remove('error');
+    $('pT').disabled=true;$('pV').disabled=true;$('bCommit').disabled=true;
+    $('s2Fb').innerHTML='<span class="good">✅ Prediction locked: t='+a.toFixed(1)+' s, v='+b.toFixed(3)+' m/s. Release enabled.</span>';
+    $('bRun').disabled=false;$('bRun').textContent='🚀 Release';
+    sndNotebookOK();radio('PHIL: Numbers received. If they\'re wrong, we\'ll both know very publicly.');};
+  $('bCommit').onclick=doCommit;activeCheck=doCommit;
+  $('bRun').onclick=()=>{if($('bRun').disabled||phase==='running'||phase==='counting')return;startS2Run();};
+  $$('#sidePanel [data-rm]').forEach(b=>b.onclick=()=>{rateMode=b.dataset.rm;
+    $$('#sidePanel [data-rm]').forEach(x=>x.classList.toggle('pri',x===b));
+    toast(rateMode==='real'?'▶ Real time — bring a book.':'⏩ AUTO — ~10 s watched, labelled on screen.');});
+  // NOTE: even when the stage is already passed, a replay still requires a fresh
+  // committed prediction — the Release is never enabled with an empty prediction (Art.1).
+}
+function startS2Run(){
+  const P=D.s2;
+  veh=makeVeh(P.h,P.v0);earthVeh={y:P.h,vy:P.v0,t:0,maxV:P.v0};hist=[];radioIdx=0;watchedT=0;simAcc=0;
+  rate=rateMode==='real'?1:computeAutoRate(P.h,P.v0);
+  phase='counting';countdown(()=>{phase='running';sndRunStart();radio(RADIO_POOL[0]);});
+}
+function finishStage2(){
+  phase='ended';
+  const P=D.s2,th=theory(P.h,P.v0);
+  const tE=Math.abs(pred.t-th.t)/th.t, vE=Math.abs(pred.v-th.v)/th.v, err=Math.max(tE,vE)*100;
+  let medal=null;if(err<5)medal='gold';else if(err<10)medal='silver';else if(err<20)medal='bronze';
+  if(medal){awardStage(medal);ach.a1=true;if(medal==='gold')ach.a2=true;if(tE<0.02&&vE<0.02)ach.a4=true;}
+  else streak=0,$('tsStreak').textContent=streak;
+  celebrate(medal||'fail');
+  lastR={stage:1,medal,err,tE,vE,th,pred:{...pred},P};
+  showDebrief();
+}
+
+/* ---- STAGE 3: INVERSE ---- */
+function buildS3(sp,done){
+  const P=D.s3;
+  sp.innerHTML=`
+  <div class="block"><h3>🎯 Stage 3 — Inverse problem ${stageWrong[2]?'<span class="att-badge">wrong: '+stageWrong[2]+'</span>':''}</h3>
+    <div class="mini">The science team needs the anchoring harpoons to fire at impact. They only arm inside a narrow speed window. <b>Your number IS the mission.</b></div>
+    <div class="sr"><div class="k">Release altitude h</div><div class="v">${P.h} m (fixed)</div></div>
+    <div class="sr"><div class="k">Harpoon window v_td</div><div class="v">${P.vt.toFixed(2)} ± ${P.win.toFixed(3)} m/s</div></div>
+    <div class="sr"><div class="k">g (67P)</div><div class="v">1.0×10⁻³ m/s²</div></div>
+    <div class="sr"><div class="k">Escape (rebound)</div><div class="v">≥ 0.90 m/s</div></div>
+  </div>
+  <div id="s3Mcq"></div>
+  <div class="block"><h3>🔒 Your computed v₀ drives the lander</h3>
+    <div class="nb-step"><span class="step-num">1</span><span class="step-text">Invert: v_td² = v₀² + 2gh → v₀ = √(v_td² − 2gh)</span>
+      <div style="margin-top:4px;display:flex;gap:8px;align-items:center"><span class="mini">v₀ (m/s):</span><input class="numInput" id="pV0" type="number" step="0.0001" placeholder="0.____" disabled/></div></div>
+    <button class="btn go" id="bCommit3" style="width:100%;margin-top:4px" disabled>📝 Commit v₀</button>
+    <div class="mini" id="s3Fb" style="margin-top:5px"></div>
+    <button class="btn pri" id="bRun3" style="width:100%;margin-top:6px" disabled>🚀 Release (locked)</button>
+    <div class="mini" style="margin-top:5px">Playback: AUTO ≈10 s, labelled on screen.</div>
+  </div>`;
+  let committed=done;
+  buildMCQ($('s3Mcq'),2,()=>{['pV0','bCommit3'].forEach(id=>$(id).disabled=false);
+    if(!done)radio('Dr. Costa: √h-scaling on record. Now solve for the push.');},done);
+  const doCommit=()=>{ensureAudio();
+    if($('bCommit3').disabled)return;
+    const raw=$('pV0').value;eggCheck(raw);
+    const v0=parseFloat(raw);
+    if(isNaN(v0)||v0<0){wrongAttempt($('s3Fb'),$('pV0'),'A non-negative speed, in m/s.');return;}
+    if(v0>=ESC){wrongAttempt($('s3Fb'),$('pV0'),'That push is at/above ESCAPE velocity — Philae would leave 67P immediately. Rethink.');return;}
+    if(v0>P.vt){wrongAttempt($('s3Fb'),$('pV0'),'Your v₀ exceeds the target touchdown speed — falling only ADDS speed. v₀ must be smaller than v_td.');return;}
+    committed=true;planV0=v0;
+    $('pV0').classList.remove('error');$('pV0').disabled=true;$('bCommit3').disabled=true;
+    $('s3Fb').innerHTML='<span class="good">✅ v₀ = '+v0.toFixed(4)+' m/s committed. It now drives the lander — no take-backs.</span>';
+    $('bRun3').disabled=false;$('bRun3').textContent='🚀 Release';
+    sndNotebookOK();};
+  $('bCommit3').onclick=doCommit;activeCheck=doCommit;
+  $('bRun3').onclick=()=>{if($('bRun3').disabled||phase==='running'||phase==='counting')return;startS3Run();};
+  if(done){$('bRun3').disabled=true;$('s3Fb').innerHTML='<span class="good">Stage already passed — retry via debrief if you want a better medal.</span>';
+    $('pV0').disabled=false;$('bCommit3').disabled=false;}
+}
+function startS3Run(){
+  const P=D.s3;
+  veh=makeVeh(P.h,planV0);earthVeh=null;hist=[];radioIdx=0;watchedT=0;simAcc=0;
+  rate=computeAutoRate(P.h,planV0);
+  phase='counting';countdown(()=>{phase='running';sndRunStart();radio('PHIL: Push received: '+planV0.toFixed(4)+' m/s. Harpoons armed and judging you.');});
+}
+function finishStage3(){
+  phase='ended';
+  const P=D.s3, v0req=Math.sqrt(P.vt*P.vt-2*G*P.h);
+  const err=Math.abs(planV0-v0req)/v0req*100;
+  let medal=null;
+  if(veh.anchored){if(err<5)medal='gold';else if(err<10)medal='silver';else if(err<20)medal='bronze';}
+  if(medal){awardStage(medal);if(Math.abs(veh.vy-P.vt)<=P.win/2)ach.a3=true;}
+  else streak=0,$('tsStreak').textContent=streak;
+  celebrate(medal||'fail');
+  lastR={stage:2,medal,err,v0req,planV0,P,vTd:Math.abs(veh.vy),anchored:veh.anchored,lost:veh.lost};
+  showDebrief();
+}
+
+/* ---- STAGE 4: BOUNCE CRISIS ---- */
+function buildS4(sp){
+  sp.innerHTML=`
+  <div class="block"><h3>🚨 Stage 4 — 12 November 2014 ${stageWrong[3]?'<span class="att-badge">wrong: '+stageWrong[3]+'</span>':''}</h3>
+    <div class="mini">History replay: the descent is flown for you, and — exactly as in 2014 — <b>the harpoons will fail at touchdown</b>. Philae rebounds. You then have <b>60 seconds</b> (mission-frozen) to compute and decide. Wrong action = mission fail. Events re-roll on retry.</div>
+    <button class="btn go" id="bRun4" style="width:100%;margin-top:6px">🚀 Begin the historical descent</button>
+  </div>
+  <div id="s4Mcq"></div>
+  <div class="block"><h3>Reference</h3><div class="formula">apex h = v_b²/(2g)
+escape: v_b ≥ 0.90 m/s → never returns
+thruster (one shot): Δv = −0.30 m/s</div></div>
+  <div id="s4Decision"></div>`;
+  let mcqOK=!!stageMedal[3];
+  buildMCQ($('s4Mcq'),3,()=>{mcqOK=true;
+    radio('Dr. Costa: h = v²/2g understood. Descent authorised — brace for the harpoons.');},!!stageMedal[3]);
+  $('bRun4').onclick=()=>{
+    if(!mcqOK){toast('🔒 Answer the insight check first — you\'ll need it in 60 seconds of panic.');sndFail();return;}
+    if(phase==='running'||phase==='counting')return;
+    startS4Run();};
+}
+function startS4Run(){
+  crisis=CRISES[Math.floor(Math.random()*CRISES.length)];
+  veh=makeVeh(crisis.h,crisis.v0);earthVeh=null;hist=[];radioIdx=0;watchedT=0;simAcc=0;
+  rate=computeAutoRate(crisis.h,crisis.v0);
+  phase='counting';countdown(()=>{phase='running';sndRunStart();
+    radio('PHIL: Descent locked in by ESOC. Touchdown speed will be '+theory(crisis.h,crisis.v0).v.toFixed(2)+' m/s. What could go wrong?');});
+}
+function buildDecisionPanel(){
+  const vb=crisis.vb;
+  const box=$('s4Decision');
+  box.innerHTML=`
+  <div class="block" style="border-color:rgba(255,112,112,.4)"><h3>⚠️ HARPOONS FAILED — DECIDE</h3>
+    <div class="crisis-timer" id="cTimer">60</div>
+    <div class="sr"><div class="k">Rebound speed v_b</div><div class="v warn">${vb.toFixed(3)} m/s ↑</div></div>
+    <div class="nb-step"><span class="step-num">1</span><span class="step-text">Escape check: is v_b ≥ 0.90 m/s?</span></div>
+    <div class="nb-step"><span class="step-num">2</span><span class="step-text">If it stays: apex h = v_b²/(2g). If it escapes: fire thruster (Δv=−0.30), then apex of the NEW v_b.</span>
+      <div style="margin-top:4px;display:flex;gap:8px;align-items:center"><span class="mini">apex (m):</span><input class="numInput" id="pApex" type="number" step="0.1" placeholder="___._"/></div>
+      <button class="btn go" id="bApex" style="margin-top:4px">check apex</button><span class="mini" id="apexFb"></span></div>
+    <div class="nb-step"><span class="step-num">3</span><span class="step-text">Action:</span>
+      <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+        <button class="btn" id="actWait">🧘 WAIT — it will come back</button>
+        <button class="btn danger" id="actFire">🔥 FIRE THRUSTER (Δv −0.30)</button>
+      </div>
+      <div class="mini" id="actFb" style="margin-top:4px"></div></div>
+  </div>`;
+  crisisTick=setInterval(()=>{crisisTimer--;$('cTimer').textContent=crisisTimer;
+    if(crisisTimer===15){playTone(880,.1,'sine',.06);radio('Dr. Costa: 15 seconds. Numbers, not nerves.');}
+    if(crisisTimer<=0){clearInterval(crisisTick);crisisFail('⏱ Time expired. In 2014 there was no pause button either — but there was preparation.');}
+  },1000);
+  const apexTarget=(crisis.escape? (crisis.vb-THRUST_DV):crisis.vb);
+  const apexVal=apexTarget*apexTarget/(2*G);
+  $('bApex').onclick=()=>{ensureAudio();
+    const raw=$('pApex').value;eggCheck(raw);const a=parseFloat(raw);
+    if(isNaN(a)){wrongAttempt($('apexFb'),$('pApex'),'A height in metres.');return;}
+    const rel=Math.abs(a-apexVal)/apexVal;
+    if(rel<0.20){crisisApexOK=true;$('pApex').classList.remove('error');
+      $('apexFb').innerHTML='<span class="good">✅ apex ≈ '+a.toFixed(0)+' m ('+(rel*100).toFixed(1)+'% off)</span>';
+      lastApexErr=rel*100;sndCompute();}
+    else if(crisis.escape&&Math.abs(a-crisis.vb*crisis.vb/(2*G))/(crisis.vb*crisis.vb/(2*G))<0.1){
+      wrongAttempt($('apexFb'),$('pApex'),'You computed the apex of the ESCAPING v_b — but at ≥0.9 m/s there is no apex. Fire first, then compute the post-burn apex.');}
+    else wrongAttempt($('apexFb'),$('pApex'),'Off. h = v_b²/(2g) with g = 0.001 — mind the little numbers.');};
+  $('actWait').onclick=()=>decide('wait');
+  $('actFire').onclick=()=>decide('fire');
+  activeCheck=()=>$('bApex').click();
+}
+let lastApexErr=100;
+function decide(action){
+  ensureAudio();crisisActed=action;
+  const correct=crisis.escape?'fire':'wait';
+  if(action!==correct){
+    clearInterval(crisisTick);
+    crisisFail(action==='fire'
+      ?'You burned the only thruster on a rebound of '+crisis.vb.toFixed(2)+' m/s — BELOW escape (0.90). It was coming back on its own; the burn destabilised the return. Gas is for emergencies that are real.'
+      :'You waited on a rebound of '+crisis.vb.toFixed(2)+' m/s — AT/ABOVE escape (0.90). Philae never came back. The one correct move was the immediate burn.');
+    return;
+  }
+  if(!crisisApexOK){wrongAttempt($('actFb'),null,'Action noted, but commit a correct apex first — decisions need numbers attached.');crisisActed=null;return;}
+  clearInterval(crisisTick);
+  if(action==='fire'){veh.vy=-(crisis.vb-THRUST_DV);toast('🔥 Burn complete: rebound now '+(crisis.vb-THRUST_DV).toFixed(2)+' m/s — sub-escape.');playNoise(.3,.08);}
+  $('s4Decision').innerHTML='<div class="block"><div class="mini good">✅ Decision locked. Watching the bounce arc — compressed and labelled.</div></div>';
+  const vb=Math.abs(veh.vy),flight=2*vb/G;
+  rate=clamp(Math.round(flight/8),1,2000);
+  phase='running';radio('PHIL: Ballistic and philosophical. See you at apex '+ (vb*vb/(2*G)).toFixed(0)+' m.');
+}
+function crisisFail(msg){
+  phase='ended';streak=0;$('tsStreak').textContent=streak;
+  celebrate('fail');
+  lastR={stage:3,medal:null,failMsg:msg,crisis,apexErr:lastApexErr,acted:crisisActed};
+  showDebrief();
+}
+function finishStage4(){
+  phase='ended';
+  let medal=null;
+  if(lastApexErr<5)medal='gold';else if(lastApexErr<10)medal='silver';else if(lastApexErr<20)medal='bronze';
+  awardStage(medal);ach.a5=true;
+  celebrate(medal||'bronze');
+  lastR={stage:3,medal,crisis,apexErr:lastApexErr,acted:crisisActed};
+  showDebrief();
+  if(stageMedal[0]&&stageMedal[1]&&stageMedal[2]&&stageMedal[3]){
+    setTimeout(()=>{toast('🏆 FULL MISSION COMPLETE — final score '+score+'/100');
+      celebrate(score>=85?'gold':score>=70?'silver':'bronze');},1600);}
+}
+
+/* ===== DEBRIEF (Art.8: prediction vs reality, abs+rel error, full solution) ===== */
+function showDebrief(){
+  const f=lastR;if(!f)return;
+  const rb=$('eRB'),ab=$('eAB');rb.innerHTML='';ab.innerHTML='';
+  const add=(tb,k,v,c='')=>{const tr=document.createElement('tr');tr.innerHTML=`<th>${k}</th><td class="${c}">${v}</td>`;tb.appendChild(tr);};
+  const medalTxt={gold:'🥇 GOLD',silver:'🥈 SILVER',bronze:'🥉 BRONZE'}[f.medal]||'💔 TRY AGAIN';
+  $('eMed').textContent=medalTxt;
+  let sol='';
+  if(f.stage===1){
+    $('eTit').textContent=f.medal?'Prediction verified':'Prediction missed';
+    add(rb,'Your t',f.pred.t.toFixed(1)+' s');
+    add(rb,'Actual t',f.th.t.toFixed(1)+' s');
+    add(rb,'Your v',f.pred.v.toFixed(3)+' m/s');
+    add(rb,'Actual v',f.th.v.toFixed(3)+' m/s');
+    add(ab,'t error',Math.abs(f.pred.t-f.th.t).toFixed(1)+' s ('+(f.tE*100).toFixed(1)+'%)',f.tE<.05?'good':f.tE<.2?'warn':'bad');
+    add(ab,'v error',Math.abs(f.pred.v-f.th.v).toFixed(3)+' m/s ('+(f.vE*100).toFixed(1)+'%)',f.vE<.05?'good':f.vE<.2?'warn':'bad');
+    add(ab,'Medal rule','max error <5% 🥇 · <10% 🥈 · <20% 🥉');
+    const eT=theory(f.P.h,f.P.v0,G_E);
+    add(ab,'Earth, same drop','t='+eT.t.toFixed(1)+' s, v='+eT.v.toFixed(1)+' m/s — '+(f.th.t/eT.t).toFixed(0)+'× slower here');
+    sol=`v₀²+2gh = ${f.P.v0}² + 2·0.001·${f.P.h} = ${(f.P.v0**2+2*G*f.P.h).toFixed(4)}<br>`+
+        `√ = ${Math.sqrt(f.P.v0**2+2*G*f.P.h).toFixed(4)} m/s = <b>v_td</b><br>`+
+        `t = (${Math.sqrt(f.P.v0**2+2*G*f.P.h).toFixed(4)} − ${f.P.v0}) / 0.001 = <b>${f.th.t.toFixed(1)} s</b> ≈ ${(f.th.t/60).toFixed(1)} min`;
+  } else if(f.stage===2){
+    $('eTit').textContent=f.anchored?'Harpoons anchored!':(f.lost?'Impact catastrophic':'Outside the window — bounce');
+    add(rb,'Required v₀',f.v0req.toFixed(4)+' m/s');
+    add(rb,'Your v₀',f.planV0.toFixed(4)+' m/s');
+    add(rb,'Touchdown v',f.vTd.toFixed(4)+' m/s');
+    add(rb,'Window',f.P.vt.toFixed(2)+' ± '+f.P.win.toFixed(3));
+    add(ab,'v₀ error',Math.abs(f.planV0-f.v0req).toFixed(4)+' ('+f.err.toFixed(1)+'%)',f.err<5?'good':f.err<20?'warn':'bad');
+    add(ab,'Anchored',f.anchored?'YES':'NO',f.anchored?'good':'bad');
+    add(ab,'Medal rule','anchored AND v₀ error <5/10/20%');
+    sol=`2gh = 2·0.001·${f.P.h} = ${(2*G*f.P.h).toFixed(3)}<br>`+
+        `v_td² − 2gh = ${f.P.vt}² − ${(2*G*f.P.h).toFixed(3)} = ${(f.P.vt**2-2*G*f.P.h).toFixed(4)}<br>`+
+        `v₀ = √${(f.P.vt**2-2*G*f.P.h).toFixed(4)} = <b>${f.v0req.toFixed(4)} m/s</b>`;
+  } else if(f.stage===3){
+    $('eTit').textContent=f.medal?'Crisis survived — Philae anchored':'Mission lost';
+    const vb=f.crisis.vb, esc=f.crisis.escape;
+    add(rb,'Rebound v_b',vb.toFixed(3)+' m/s');
+    add(rb,'Escape limit','0.900 m/s');
+    add(rb,'Verdict',esc?'ESCAPING':'returns',esc?'bad':'good');
+    add(rb,'Correct action',esc?'FIRE (Δv −0.30)':'WAIT');
+    add(ab,'Your action',f.acted?f.acted.toUpperCase():'—',f.medal?'good':'bad');
+    add(ab,'Apex error',f.apexErr<100?f.apexErr.toFixed(1)+'%':'—',f.apexErr<5?'good':f.apexErr<20?'warn':'bad');
+    if(f.failMsg)add(ab,'Debrief',f.failMsg,'bad');
+    const vEff=esc?vb-THRUST_DV:vb;
+    sol=(esc?`v_b = ${vb.toFixed(3)} ≥ 0.900 → escapes → burn: v_b' = ${vb.toFixed(3)} − 0.300 = ${vEff.toFixed(3)} m/s<br>`:
+             `v_b = ${vb.toFixed(3)} &lt; 0.900 → it returns; the burn would be waste + risk<br>`)+
+        `apex h = v²/(2g) = ${vEff.toFixed(3)}² / 0.002 = <b>${(vEff*vEff/(2*G)).toFixed(1)} m</b><br>`+
+        `return time = 2v/g = ${(2*vEff/G).toFixed(0)} s ≈ ${(2*vEff/(G*60)).toFixed(0)} min — 2014's two lost hours, explained.`;
+  }
+  $('eSol').innerHTML=sol;
+  // chart
+  const cc=$('eCh'),ctx=cc.getContext('2d'),W=cc.width,H=cc.height;ctx.clearRect(0,0,W,H);
+  if(hist.length>=2){const pad=26,mT=hist[hist.length-1].t||1,mY=Math.max(...hist.map(d=>d.y),10),mV=Math.max(...hist.map(d=>Math.abs(d.vy)),.1);
+    ctx.strokeStyle='rgba(255,255,255,.08)';ctx.beginPath();ctx.moveTo(pad,3);ctx.lineTo(pad,H-pad);ctx.lineTo(W-3,H-pad);ctx.stroke();
+    ctx.strokeStyle='#6be0ff';ctx.lineWidth=2;ctx.beginPath();hist.forEach((d,i)=>{const x=pad+(W-pad-5)*(d.t/mT),y=H-pad-(H-pad-5)*(d.y/mY);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+    ctx.strokeStyle='#ffd166';ctx.lineWidth=2;ctx.beginPath();hist.forEach((d,i)=>{const x=pad+(W-pad-5)*(d.t/mT),y=H-pad-(H-pad-5)*(Math.abs(d.vy)/mV);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();}
+  $('bNext').disabled=!(stageMedal[stage]&&stage<3);
+  $('bNext').textContent=stage>=3?'Mission complete 🏁':(stageMedal[stage]?'Next stage →':'Next stage (needs Bronze+) 🔒');
+  $('endScr').classList.add('open');
+}
+
+/* ===== countdown ===== */
+function countdown(cb){const box=$('cdBox');box.classList.add('on');let n=3;
+  box.textContent=n;sndCountdown(n);
+  const iv=setInterval(()=>{n--;
+    if(n>0){box.textContent=n;sndCountdown(n);}
+    else if(n===0){box.textContent='🚀';sndCountdown(0);}
+    else{box.classList.remove('on');clearInterval(iv);cb();}},600);}
+
+/* ===== MAIN LOOP (honest wall-clock timing) ===== */
+let lastTs=0;
+function loop(ts){
+  const wallDt=Math.min((ts-lastTs)/1000||0,0.05);lastTs=ts;
+  if(phase==='running'&&veh){
+    watchedT+=wallDt;
+    simAcc+=currentRate()*wallDt;
+    let steps=0;
+    while(simAcc>=DT&&steps<6000&&phase==='running'){step(DT);simAcc-=DT;steps++;}
+    tickRadio();if(stage===0)s1Tick();
+  }
+  updateParticles(wallDt);
+  draw();drawFireworksCanvas();
+  raf=requestAnimationFrame(loop);
+}
+
+/* ===== language / difficulty / start ===== */
+function applyLang(){
+  $('xDial').innerHTML=T.en.dial;
+  $('xHero').textContent=t('hero');
+  $('xLrn').textContent=T.en.lrn;$('xMis').textContent=T.en.mis;$('xForm').textContent=T.en.form;
+  $('goBtn').textContent=t('go');
+  $$('#iLangs .ibtn,#gLangs .ibtn').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+  if($('gameScreen').style.display==='block')buildStageBar();
+}
+function setLang(l){if(!T[l])return;lang=l;applyLang();}
+function setDiff(d){if(!DIFFS[d])return;diff=d;D=DIFFS[d];
+  $$('#iDiffs .ibtn').forEach(b=>b.classList.toggle('active',b.dataset.diff===d));
+  $('diffDesc').textContent=D.desc;}
+function startGame(){ensureAudio();
+  $('introScreen').style.display='none';$('gameScreen').style.display='block';
+  score=0;hints=0;wrongTotal=0;streak=0;rankFired={r30:false,r60:false,r90:false};
+  stageMedal=[null,null,null,null];stagePts=[0,0,0,0];stageWrong=[0,0,0,0];
+  $('tsScore').textContent='0';$('tsHints').textContent='0';$('tsAtt').textContent='0';$('tsStreak').textContent='0';
+  setStage(Math.min(0,unlockedMax));resizeC();
+  sndMissionReady();
+  radio('Dr. Costa: Welcome to ESOC, flight controller. Target: comet 67P. Reasoning first, numbers second, release third.');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  const _hx=document.getElementById('hintBarX');if(_hx)_hx.onclick=hideHintBar;
+  $$('#iLangs .ibtn').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+  $$('#iDiffs .ibtn').forEach(b=>b.addEventListener('click',()=>setDiff(b.dataset.diff)));
+  $$('#gLangs .ibtn').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+  $('goBtn').addEventListener('click',startGame);
+  $('bRetry').addEventListener('click',()=>{$('endScr').classList.remove('open');setStage(stage);});
+  $('bNext').addEventListener('click',()=>{if(stage<3&&stageMedal[stage]){$('endScr').classList.remove('open');setStage(stage+1);}else $('endScr').classList.remove('open');});
+  document.addEventListener('keydown',e=>{
+    if($('introScreen').style.display!=='none'){if(e.code==='Enter'||e.code==='Space'){e.preventDefault();startGame();}return;}
+    if($('endScr').classList.contains('open')){if(e.code==='KeyR'){$('bRetry').click();}return;}
+    if(e.code==='Enter'&&activeCheck&&phase!=='running'){e.preventDefault();activeCheck();return;}
+    if(e.code==='Space'){e.preventDefault();
+      const runBtn=$('bRun')||$('bRun3')||$('bRun4')||$('bWatch');
+      if(runBtn&&!runBtn.disabled&&phase==='ready')runBtn.click();return;}
+    if(e.code==='KeyP'){if(phase==='running'){phase='paused';toast('⏸ Paused — the universe waits for your calculation.');}
+      else if(phase==='paused'){phase='running';toast('▶ Resumed');}return;}
+    if(e.code==='KeyR'){if(phase!=='decision'&&confirm('Reset this stage?'))setStage(stage);return;}
+    if(e.code==='KeyH'){useHint();return;}
+  });
+  window.addEventListener('resize',resizeC);
+  const bl=navigator.language?.slice(0,2);setLang(bl==='el'?'el':bl==='it'?'it':'en');
+  setDiff('easy');
+  requestAnimationFrame(loop);
+});
+</script>
+</body>
+</html>
