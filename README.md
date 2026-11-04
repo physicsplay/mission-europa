@@ -1,6 +1,8 @@
 # MISSION EUROPA — website
 
 The project hub for the eTwinning project **Mission Europa** (October 2026 to April 2027).
+Founding schools: 2nd General Lyceum of Moschato (Athens, Greece), Liceo Scientifico Statale
+Renato Caccioppoli (Naples, Italy) and IES Las Espeñetas (Orihuela, Spain).
 It is a static site for GitHub Pages: no framework, no build step, no server, no cookies,
 no analytics and no external requests. It also works offline: open `index.html`.
 
@@ -46,7 +48,7 @@ The phase marker, the countdowns and the key dates move by themselves.
 
 | Job | What to change |
 |---|---|
-| A partner school joins | In `crews`: set `status: "confirmed"` and fill `school`, `place`, `country`, `cc` (two letters, e.g. `"IT"`). |
+| A partner school joins | In `crews`: delete the `//` in front of a spare line, fill `school`, `place`, `country`, `cc` (two letters, e.g. `"PT"`), and add its id to the `twin` list of the crews it works with. Mission Control rearranges itself for 3–6 crews. |
 | Twin crews are paired | Set `twin` on one of the two crews, e.g. `twin: "c04"`. The other side updates itself. |
 | A crew sends its mission patch | Put the image in `media/patches/` and set `patch: "media/patches/c01.png"`. |
 | Tester mode is ready in a game | Set `testerMode: true` for that game. A *Tester mode* button appears. |

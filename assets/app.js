@@ -74,6 +74,13 @@
     });
     return out;
   };
+  const twinLabel = (list) => (list.length > 1 ? 'Twin crews' : 'Twin crew');
+  const twinText = (list, sep) => list.map((x) => `${x.code}${x.place ? sep[0] + x.place + sep[1] : ''}`).join(', ');
+  const NUM_WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
+  const numWord = (n) => NUM_WORDS[n] || String(n);
+  const listJoin = (xs) => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`);
+  const countries = [...new Set(confirmed.map((c) => c.country).filter(Boolean))];
+  const places = confirmed.map((c) => c.place).filter(Boolean);
   const games = arr(cfg.games);
   const gameById = (id) => games.find((g) => g.id === id);
 
@@ -171,6 +178,19 @@
   }
   const keyDates = arr(cfg.keyDates).map((k) => ({ ...k, s: parseDate(k.date), e: parseDate(k.end) || parseDate(k.date) })).filter((k) => k.s).sort((a, b) => a.s - b.s);
 
+  /* --------------------------------------------------------- launch note */
+  safe('launch', () => {
+    if (!confirmed.length) return;
+    const cap = (t) => t.replace(/^./, (x) => x.toUpperCase());
+    $$('[data-crew-count]').forEach((el) => { const t = numWord(confirmed.length); el.textContent = el.dataset.crewCount === 'cap' ? cap(t) : t; });
+    $$('[data-country-count]').forEach((el) => { el.textContent = numWord(countries.length); });
+    if (countries.length) $$('[data-country-list]').forEach((el) => { el.textContent = listJoin(countries); });
+    const host = $('#launchCrews');
+    if (host) {
+      host.innerHTML = confirmed.map((c) => `<li style="--c:${esc(c.accent || '#fff')}"><b>${esc(c.cc || c.code)}</b><span><strong>${esc(c.place || crewName(c))}</strong>${esc(c.school || '')}</span></li>`).join('');
+    }
+  });
+
   /* ------------------------------------------------------- mission control */
   safe('mission control', () => {
     const phaseEl = $('#mcPhase'); const labelEl = $('#mcPhaseLabel'); const pill = $('#mcPill');
@@ -214,15 +234,30 @@
   /* ------------------------------------------------------------- network */
   safe('network', () => {
     const stage = $('#networkStage'); const host = $('#networkNodes'); const canvas = $('#networkCanvas'); const info = $('#nodeInfo');
-    const pos = [[0.17, 0.2], [0.83, 0.2], [0.9, 0.56], [0.72, 0.84], [0.28, 0.84], [0.1, 0.56]];
+    // Node positions (fractions of the stage) for each number of crews.
+    // Three crews sit roughly where they are on the map: Naples to the north,
+    // Orihuela to the west, Athens to the east.
+    const LAYOUTS = {
+      1: [[0.5, 0.13]],
+      2: [[0.15, 0.46], [0.85, 0.46]],
+      3: [[0.84, 0.74], [0.5, 0.13], [0.16, 0.74]],
+      4: [[0.17, 0.2], [0.83, 0.2], [0.83, 0.76], [0.17, 0.76]],
+      5: [[0.5, 0.12], [0.88, 0.42], [0.74, 0.84], [0.26, 0.84], [0.12, 0.42]],
+      6: [[0.17, 0.2], [0.83, 0.2], [0.9, 0.56], [0.72, 0.84], [0.28, 0.84], [0.1, 0.56]]
+    };
     const slots = crews.slice(0, 6);
+    const pos = LAYOUTS[slots.length] || LAYOUTS[6];
+    const idleText = confirmed.length
+      ? `${numWord(confirmed.length).replace(/^./, (s) => s.toUpperCase())} crew${confirmed.length > 1 ? 's' : ''} on board${places.length ? ': ' + places.join(' · ') : ''}. Tap a crew to see who it is.`
+      : 'Tap a crew to see who it is.';
+    info.textContent = idleText;
     let ctx; let w = 0; let h = 0; let raf = 0; let visible = true; let selected = null;
 
     function describe(c) {
-      if (c.status !== 'confirmed') return `Crew slot ${c.code} is open. Partner schools can join until ${fmt(parseDate(P.lateJoinBy)) || 'mid-October'}.`;
+      if (c.status !== 'confirmed') return `Crew slot ${c.code} is open.`;
       const tw = twinsOf(c);
       const place = [c.place, c.country].filter(Boolean).join(', ');
-      return `Crew ${c.code}${place ? ' · ' + place : ''}${c.school ? ' · ' + c.school : ''}. Twin crew: ${tw.length ? tw.map((x) => `${x.code}${x.place ? ' (' + x.place + ')' : ''}`).join(', ') : 'paired at the kick-off'}.`;
+      return `Crew ${c.code}${place ? ' · ' + place : ''}${c.school ? ' · ' + c.school : ''}. ${twinLabel(tw)}: ${tw.length ? twinText(tw, [' (', ')']) : 'paired at the kick-off'}.`;
     }
     slots.forEach((c, i) => {
       const b = document.createElement('button');
@@ -236,7 +271,7 @@
       b.addEventListener('click', () => {
         selected = selected === c.id ? null : c.id;
         $$('.network-node', host).forEach((n) => n.setAttribute('aria-pressed', 'false'));
-        if (selected) { b.setAttribute('aria-pressed', 'true'); info.textContent = describe(c); tone('tap'); } else info.textContent = 'Tap a crew to see who it is.';
+        if (selected) { b.setAttribute('aria-pressed', 'true'); info.textContent = describe(c); tone('tap'); } else info.textContent = idleText;
         if (reducedMotion()) draw(0);
       });
       host.appendChild(b);
@@ -579,7 +614,7 @@
         <h3>${esc(crewName(c))}</h3>
         <p class="crew-place">${esc([c.school, c.country].filter(Boolean).join(' · '))}</p>
         <ul class="crew-links">
-          <li>Twin crew: <b>${tw.length ? esc(tw.map((x) => `${x.code}${x.place ? ' · ' + x.place : ''}`).join(', ')) : 'paired at the kick-off'}</b></li>
+          <li>${twinLabel(tw)}: <b>${tw.length ? esc(twinText(tw, [' · ', ''])) : 'paired at the kick-off'}</b></li>
           ${s1 || s2 ? `<li>Studios: <b>${esc([s1 && 'Game 1 · ' + s1, s2 && 'Game 2 · ' + s2].filter(Boolean).join(' / '))}</b></li>` : ''}
           <li>Bounty points: <b>${points[c.id] || 0}</b></li>
         </ul>
@@ -831,7 +866,7 @@
     const jb = parseDate(P.joinBy); const lj = parseDate(P.lateJoinBy);
     const who = [P.coordinator, [P.coordinatorSchool, P.coordinatorPlace].filter(Boolean).join(', ')].filter(Boolean).join(', ');
     let txt = `Contact the project coordinator${who ? ', ' + who + ',' : ''} through the European School Education Platform.`;
-    if (lj && t >= endOfDay(lj)) txt += ' Partner recruitment for 2026–2027 is closed.';
+    if (lj && t >= endOfDay(lj)) txt += P.joinLater ? ' ' + P.joinLater : ' Partner recruitment for 2026–2027 is closed.';
     else if (jb && t < endOfDay(jb)) txt += ` Reply by ${fmt(jb)} if you can; schools can still join until ${fmt(lj)}, during Phase 1.`;
     else if (lj) txt += ` Late joiners are welcome until ${fmt(lj)}, during Phase 1.`;
     txt += ' Tell us your school, country and subject, the age and number of your students, core or full track, and the weeks your school is closed.';

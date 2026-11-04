@@ -17,9 +17,11 @@
 window.MISSION_EUROPA = {
 
   /* One line in Mission Control on the homepage. Change it every week. */
-  thisWeek: "Partner schools are joining now. Kick-off in World Space Week, from 5 October.",
+  thisWeek: "We have lift-off! Mission Europa is under way with three crews: Athens, Naples and Orihuela.",
 
   project: {
+    /* Shown to teachers once late joining has closed. */
+    joinLater: "One or two more schools may join later, by agreement with the partner schools.",
     start: "2026-10-05",
     end: "2027-04-30",
     joinBy: "2026-09-30",
@@ -144,17 +146,22 @@ window.MISSION_EUROPA = {
   ],
 
   /* -----------------------------------------------------------------------
-     CREWS (one per school, up to six)
-     status: "confirmed" or "open".  twin: the id of the twin crew.
+     CREWS (one per school)
+     The mission runs with three founding schools. Mission Control on the
+     homepage arranges itself for 3, 4, 5 or 6 crews.
+     twin: the ids of the crews this crew works with directly.
      patch: an image in media/patches/ once the crew has designed it.
+
+     A school joins later: delete the two slashes // in front of one of the
+     spare lines below, fill in school, place, country and cc, and add its
+     id to the twin list of the crews it works with.
      ----------------------------------------------------------------------- */
   crews: [
-    { id: "c01", code: "01", status: "confirmed", name: "", school: "2nd General Lyceum of Moschato", place: "Athens", country: "Greece", cc: "GR", accent: "#5E49FF", twin: "", patch: "" },
-    { id: "c02", code: "02", status: "open", name: "", school: "", place: "", country: "", cc: "", accent: "#00BFA3", twin: "", patch: "" },
-    { id: "c03", code: "03", status: "open", name: "", school: "", place: "", country: "", cc: "", accent: "#FF4F91", twin: "", patch: "" },
-    { id: "c04", code: "04", status: "open", name: "", school: "", place: "", country: "", cc: "", accent: "#F2A900", twin: "", patch: "" },
-    { id: "c05", code: "05", status: "open", name: "", school: "", place: "", country: "", cc: "", accent: "#00A8FF", twin: "", patch: "" },
-    { id: "c06", code: "06", status: "open", name: "", school: "", place: "", country: "", cc: "", accent: "#7ACC29", twin: "", patch: "" }
+    { id: "c01", code: "01", status: "confirmed", name: "", school: "2nd General Lyceum of Moschato", place: "Athens", country: "Greece", cc: "GR", accent: "#5E49FF", twin: ["c02", "c03"], patch: "" },
+    { id: "c02", code: "02", status: "confirmed", name: "", school: "Liceo Scientifico Statale Renato Caccioppoli", place: "Naples", country: "Italy", cc: "IT", accent: "#00BFA3", twin: ["c03"], patch: "" },
+    { id: "c03", code: "03", status: "confirmed", name: "", school: "IES Las Espeñetas", place: "Orihuela", country: "Spain", cc: "ES", accent: "#FF4F91", twin: [], patch: "" },
+    // { id: "c04", code: "04", status: "confirmed", name: "", school: "", place: "", country: "", cc: "", accent: "#F2A900", twin: [], patch: "" },
+    // { id: "c05", code: "05", status: "confirmed", name: "", school: "", place: "", country: "", cc: "", accent: "#00A8FF", twin: [], patch: "" },
   ],
 
   /* Newest first. type: "fix", "feature", "physics", "balance" or "text".
