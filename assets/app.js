@@ -16,7 +16,7 @@
   const raw = window.MISSION_EUROPA;
   const showError = (err) => { const b = $('#configError'); if (b) b.hidden = false; if (err) console.error('[Mission Europa]', err); };
   if (!raw || typeof raw !== 'object') showError('site-config.js did not define window.MISSION_EUROPA');
-  const cfg = Object.assign({ thisWeek: '', project: {}, links: {}, phases: [], keyDates: [], games: [], crews: [], patchNotes: [], bugBounty: [], bloopers: [] }, raw || {});
+  const cfg = Object.assign({ thisWeek: '', project: {}, links: {}, debrief: {}, phases: [], keyDates: [], games: [], crews: [], patchNotes: [], bugBounty: [], bloopers: [] }, raw || {});
   const P = cfg.project || {};
   const L = cfg.links || {};
 
@@ -503,7 +503,7 @@
       ];
       if (g && g.state === 'ab-test' && val(f, 'prefer')) parts.push(`plays again: ${val(f, 'prefer')}`);
       $('#outReport').textContent = parts.join(' | ');
-      hint($('#pasteHintReport'), g);
+      if (D.form) updateSend(); else hint($('#pasteHintReport'), g);
     }
     function renderCard() {
       const f = forms[1]; const g = gameById(val(f, 'game'));
@@ -520,7 +520,28 @@
     }
     function hint(host, g) {
       const url = (g && g.thread) || L.twinspace;
-      host.innerHTML = url ? `Paste it in <a href="${esc(url)}" target="_blank" rel="noopener">${g && g.thread ? 'the game’s TwinSpace thread' : 'TwinSpace'} ↗</a>` : 'Paste it in your game’s thread in the TwinSpace forum.';
+      host.innerHTML = url ? `Your crew’s best idea goes in <a href="${esc(url)}" target="_blank" rel="noopener">${g && g.thread ? 'the game’s TwinSpace thread' : 'TwinSpace'} ↗</a>` : 'Your crew’s best idea goes in the game’s thread in the TwinSpace forum.';
+    }
+    // Crew Debrief (Google Form) pre-filled with what the student typed here
+    const D = cfg.debrief || {}; const DF = D.fields || {};
+    const sendBtn = $('#sendReport'); const sendHint = $('#pasteHintReport');
+    function debriefUrl(f) {
+      const q = new URLSearchParams(); q.set('usp', 'pp_url');
+      const put = (k, v) => { if (DF[k] && v !== '' && v != null) q.set(DF[k], String(v)); };
+      const c = crewById(val(f, 'crew')); if (c) put('crew', `Crew ${c.code} · ${c.place || crewName(c)}${c.cc ? ' (' + c.cc + ')' : ''}`);
+      const g = gameById(val(f, 'game')); if (g) put('game', g.formName || g.title);
+      put('version', val(f, 'version'));
+      const st = val(f, 'stage'); put('stage', /^\d /.test(st) ? st.replace(/^(\d) /, '$1 · ') : 'The whole game / not sure');
+      const dv = val(f, 'device'); if (dv) put('device', dv[0].toUpperCase() + dv.slice(1));
+      put('attempts', val(f, 'tries')); put('error', val(f, 'error')); put('hints', val(f, 'hints')); put('minutes', val(f, 'minutes'));
+      ['fun', 'clarity', 'physics'].forEach((n) => { const fs = $(`.rating[data-name="${n}"]`); put(n, fs && fs.dataset.value); });
+      return `${D.form}?${q.toString()}`;
+    }
+    function updateSend() {
+      if (!sendBtn) return;
+      if (!D.form) { sendBtn.hidden = true; return; }
+      sendBtn.href = debriefUrl(forms[0]);
+      sendHint.textContent = 'Opens your Crew Debrief with these numbers filled in. Add your call sign, medal and idea, then press Submit.';
     }
     forms.forEach((f, i) => {
       const r = i === 0 ? renderReport : renderCard;
@@ -875,6 +896,7 @@
     if (L.partnerInfo) links.push(`<a class="button button-primary small" href="${esc(L.partnerInfo)}" target="_blank" rel="noopener">Partner information (PDF)</a>`);
     links.push(`<a class="button button-ghost-dark small" href="${esc(L.esepProfile || 'https://school-education.ec.europa.eu/en/etwinning')}" target="_blank" rel="noopener">${L.esepProfile ? 'Coordinator on ESEP' : 'eTwinning on ESEP'} ↗</a>`);
     if (L.twinspace) links.push(`<a class="button button-ghost-dark small" href="${esc(L.twinspace)}" target="_blank" rel="noopener">TwinSpace ↗</a>`);
+    if (cfg.debrief && cfg.debrief.form) links.push(`<a class="button button-ghost-dark small" href="${esc(cfg.debrief.form)}" target="_blank" rel="noopener">Crew Debrief form ↗</a>`);
     $('#teacherLinks').innerHTML = links.join('');
     const sb = parseDate(P.setupBy);
     if (sb) $('#setupBy').textContent = `By ${fmt(sb)}. No lessons needed for this.`;
