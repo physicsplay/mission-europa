@@ -136,8 +136,8 @@
       <ol class="steps reveal">
         <li><span class="step-min">5 min</span><b>Briefing</b><p>This week’s mission and your twin crew’s latest post.</p></li>
         <li><span class="step-min">20 min</span><b>Play one stage</b><p>In groups of two or three. Write down every moment you got stuck.</p></li>
-        <li><span class="step-min">10 min</span><b>Report</b><p>One mission report with your numbers, one feedback card with your idea.</p></li>
-        <li><span class="step-min">10 min</span><b>Post and reply</b><p>Paste both into TwinSpace, then answer your twin crew.</p></li>
+        <li><span class="step-min">10 min</span><b>Report</b><p>Your own Crew Debrief: your numbers, your ratings and one idea, sent to Mission Control.</p></li>
+        <li><span class="step-min">10 min</span><b>Post and reply</b><p>Your crew picks its best idea, posts one feedback card in TwinSpace, then answers your twin crews.</p></li>
       </ol>
       <div class="lesson-bar reveal" aria-label="A 45-minute lesson: 5 minutes briefing, 20 minutes play, 10 minutes report, 10 minutes post and reply">
         <span style="--w:5">5</span><span style="--w:20">20 · PLAY</span><span style="--w:10">10 · REPORT</span><span style="--w:10">10 · POST</span>
@@ -147,8 +147,8 @@
         <div class="desk-head">
           <div>
             <p class="kicker">Report desk</p>
-            <h3>Turn your notes into a post.</h3>
-            <p class="desk-note">If your game has a <b>Copy mission report</b> button, use that. Otherwise build the report here. Nothing you type leaves this page until you copy it.</p>
+            <h3>Turn your notes into a report.</h3>
+            <p class="desk-note"><b>Mission report</b> is your own: fill in your numbers, then press <b>Send to Mission Control</b> and your Crew Debrief opens with them already filled in. <b>Feedback card</b> is your crew’s shared post for TwinSpace. Nothing you type leaves this page until you send or copy it.</p>
           </div>
           <div class="tabs" role="tablist" aria-label="Report type">
             <button type="button" role="tab" id="tabReport" aria-selected="true" aria-controls="panelReport">Mission report</button>
@@ -177,7 +177,8 @@
           <div class="desk-output">
             <pre id="outReport" aria-live="polite"></pre>
             <div class="desk-actions">
-              <button class="button button-primary small" type="button" data-copy="outReport" data-sound="tap">Copy report</button>
+              <a class="button button-primary small" id="sendReport" href="#" target="_blank" rel="noopener" data-sound="launch">Send to Mission Control <span aria-hidden="true">↗</span></a>
+              <button class="button button-ghost small" type="button" data-copy="outReport" data-sound="tap">Copy report</button>
               <span class="paste-hint" id="pasteHintReport"></span>
             </div>
           </div>

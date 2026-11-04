@@ -39,6 +39,25 @@ window.MISSION_EUROPA = {
     atlas: "https://physicsplay.github.io/Astrojourneys/"
   },
 
+  /* -----------------------------------------------------------------------
+     CREW DEBRIEF (Google Form): every student sends one report per stage.
+     The Report desk's "Send to Mission Control" button opens this form with
+     the student's numbers already filled in. The "entry." codes come from
+     the form's pre-filled link; leave them as they are.
+     Never paste the responses spreadsheet's address here: this file is public.
+     ----------------------------------------------------------------------- */
+  debrief: {
+    form: "https://docs.google.com/forms/d/e/1FAIpQLScMVLMUWqb7jp0jOmxPGTgjvp89c73uOvdgDLL_8btFAZH73g/viewform",
+    fields: {
+      callSign: "entry.1366012306", crew: "entry.1187507105", game: "entry.877904644",
+      version: "entry.1543913566", stage: "entry.1177233484", device: "entry.186728748",
+      attempts: "entry.548469388", error: "entry.503274158", hints: "entry.1939643247",
+      minutes: "entry.1010612525", medal: "entry.1895800091",
+      fun: "entry.977416568", clarity: "entry.833710058", physics: "entry.216742641",
+      difficulty: "entry.1709406779"
+    }
+  },
+
   /* The six phases of the shared timetable (see the partner information). */
   phases: [
     { n: 1, title: "Launch and first playtest", start: "2026-10-05", end: "2026-10-30", core: 2, full: 3,
@@ -133,6 +152,7 @@ window.MISSION_EUROPA = {
     {
       id: "quiet", kind: "bonus", state: "live",
       title: "The Quiet One", subtitle: "Mission Europa 01 · bonus",
+      formName: "The Quiet One (bonus)",   // the game's name in the Crew Debrief form
       tag: "Crew-link mission · optional",
       pitch: "Five stations, five sealed measurements. No station can weigh the asteroid alone, so crews have to pool their evidence before choosing a spacecraft.",
       physics: "M = ρ · πD³⁄6",

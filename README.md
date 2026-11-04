@@ -59,6 +59,8 @@ The phase marker, the countdowns and the key dates move by themselves.
 | The decision is made | Set `decision: "A"`, `carryOver: "…"`, and `revealed: true` to show which studio made which version. Then `state: "live"`. |
 | A bug is confirmed | Add a line to `bugBounty` with the crew and the points. The leaderboard adds them up. |
 | A crash landing is worth keeping | Put the GIF in `media/bloopers/` and add it to `bloopers`. No faces, no names. |
+| A school joins (Crew Debrief) | Also add its choice to "Your crew" in the Google Form, written exactly `Crew 04 · City (CC)`, so the pre-filled link selects it. |
+| The Crew Debrief form is rebuilt | Paste the new form address and the new `entry.` codes (from the form's pre-filled link) into `debrief` in `site-config.js`. Never paste the responses spreadsheet's address: this repository is public. |
 | The TwinSpace exists | Paste its address in `links.twinspace`. Per-game forum threads go in each game's `thread`. |
 
 Game states: `planned` → `design` → `building` → `ab-test` → `live`.
